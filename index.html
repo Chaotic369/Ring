@@ -830,21 +830,21 @@
     }
 
     // Procedural Aesthetic Waveform (Since extracting actual audio data requires WebAudio API decoding which takes time)
-    function drawProceduralWaveform() {
-          const canvas = document.getElementById('waveform');
-          const ctx = canvas.getContext('2d');
-          canvas.width = Math.min(canvas.offsetWidth * 2, 16000); // High DPI, capped for memory safety
-          canvas.height = canvas.offsetHeight * 2;
+        function drawProceduralWaveform() {
+              const canvas = document.getElementById('waveform');
+              const ctx = canvas.getContext('2d');
+              canvas.width = Math.min(canvas.offsetWidth * 2, 16000); // High DPI, capped for memory safety
+              canvas.height = canvas.offsetHeight * 2;
       
-          const width = canvas.width;
-          const height = canvas.height;
-          const midY = height / 2;
+              const width = canvas.width;
+              const height = canvas.height;
+              const midY = height / 2;
       
-          ctx.clearRect(0, 0, width, height);
+              ctx.clearRect(0, 0, width, height);
       
-          const barWidth = 6;
-          const barGap = 4;
-          const bars = Math.floor(width / (barWidth + barGap));
+              const barWidth = 2;
+              const barGap = 2;
+              const bars = Math.floor(width / (barWidth + barGap));
       
           ctx.fillStyle = waveformPeaks ? 'rgba(139, 92, 246, 0.75)' : 'rgba(255, 255, 255, 0.4)';
       
