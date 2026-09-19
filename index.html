@@ -633,13 +633,16 @@
 
   <main class="app-container">
       <header style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
-                <h1 id="trackTitle" style="margin: 0; padding: 0; text-align: left; flex: 1;">Select Media</h1>
-                <div style="display: flex; gap: 8px;">
-                            <button class="btn-icon" id="btnThemeToggle" style="width: 32px; height: 32px; min-width: 32px;" title="Toggle Dark Mode">
-                              <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                            </button>
-                          </div>
-              </header>
+                      <div style="display: flex; flex-direction: column; align-items: flex-start; flex: 1; overflow: hidden; padding: 0 10px;">
+                        <h1 id="trackTitle" style="margin: 0; padding: 0; text-align: left;">Select Media</h1>
+                        <button id="btnRename" style="background: none; border: none; color: var(--accent); font-size: 10px; font-weight: 600; cursor: pointer; padding: 0; display: none; margin-top: 2px;">Rename</button>
+                      </div>
+                      <div style="display: flex; gap: 8px;">
+                                  <button class="btn-icon" id="btnThemeToggle" style="width: 32px; height: 32px; min-width: 32px;" title="Toggle Dark Mode">
+                                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                                  </button>
+                                </div>
+                    </header>
 
       <!-- SCREEN 1: UPLOAD -->
     <section id="uploadScreen" class="screen active">
@@ -809,6 +812,7 @@
               currentFile = file;
 
               document.getElementById('trackTitle').innerText = file.name;
+              document.getElementById('btnRename').style.display = 'block';
 
           const objectUrl = URL.createObjectURL(file);
                 media.src = objectUrl;
@@ -1431,6 +1435,7 @@
                         fileInput.value = '';
                         currentFile = null;
                         document.getElementById('trackTitle').innerText = 'Select Media';
+                        document.getElementById('btnRename').style.display = 'none';
                         waveformPeaks = null;
                 zoomLevel = 1;
                 duration = 0;
@@ -1443,11 +1448,27 @@
           uploadScreen.classList.add('active');
         }
 
-    // Theme Toggle Logic
-        document.getElementById('btnThemeToggle').addEventListener('click', () => {
-          document.documentElement.classList.toggle('dark-mode');
-          if (duration) drawProceduralWaveform();
+    // Rename Logic
+        document.getElementById('btnRename').addEventListener('click', () => {
+          if (!currentFile) return;
+          const currentName = document.getElementById('trackTitle').innerText;
+          const baseName = currentName.replace(/\.[^/.]+$/, "");
+          const ext = currentName.match(/\.[^/.]+$/)?.[0] || '';
+      
+          const newName = prompt("Enter new ringtone name:", baseName);
+          if (newName && newName.trim() !== "") {
+            const updatedName = newName.trim() + ext;
+            document.getElementById('trackTitle').innerText = updatedName;
+            // Update currentFile virtual name for export
+            currentFile = new File([currentFile], updatedName, { type: currentFile.type });
+          }
         });
+
+        // Theme Toggle Logic
+            document.getElementById('btnThemeToggle').addEventListener('click', () => {
+              document.documentElement.classList.toggle('dark-mode');
+              if (duration) drawProceduralWaveform();
+            });
 
         // Setup CSS for spinner
         const style = document.createElement('style');
