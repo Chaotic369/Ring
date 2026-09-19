@@ -1225,10 +1225,12 @@
       
               ctx.clearRect(0, 0, width, height);
 
-              // Subtle horizontal grid reference lines
-              ctx.lineWidth = 1;
-              ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
-              [0.2, 0.35, 0.5, 0.65, 0.8].forEach(ratio => {
+              const isDark = document.documentElement.classList.contains('dark-mode');
+              
+                            // Subtle horizontal grid reference lines
+                            ctx.lineWidth = 1;
+                            ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+                            [0.2, 0.35, 0.5, 0.65, 0.8].forEach(ratio => {
                 const gy = height * ratio;
                 ctx.beginPath();
                 ctx.moveTo(0, gy);
@@ -1268,21 +1270,21 @@
                 const x = i * (barWidth + barGap);
 
                 // Layer 1: Outer detailed frequency envelope
-                ctx.fillStyle = waveformPeaks ? 'rgba(30, 41, 59, 0.35)' : 'rgba(30, 41, 59, 0.2)';
-                ctx.fillRect(x, midY - totalH / 2, barWidth, totalH);
+                                ctx.fillStyle = waveformPeaks ? (isDark ? 'rgba(239, 235, 233, 0.35)' : 'rgba(30, 41, 59, 0.35)') : (isDark ? 'rgba(239, 235, 233, 0.2)' : 'rgba(30, 41, 59, 0.2)');
+                                ctx.fillRect(x, midY - totalH / 2, barWidth, totalH);
 
-                // Layer 2: Core density spike
-                ctx.fillStyle = waveformPeaks ? 'rgba(15, 23, 42, 0.85)' : 'rgba(15, 23, 42, 0.6)';
-                ctx.fillRect(x, midY - coreH / 2, barWidth, coreH);
-              }
+                                // Layer 2: Core density spike
+                                ctx.fillStyle = waveformPeaks ? (isDark ? 'rgba(239, 235, 233, 0.85)' : 'rgba(15, 23, 42, 0.85)') : (isDark ? 'rgba(239, 235, 233, 0.6)' : 'rgba(15, 23, 42, 0.6)');
+                                ctx.fillRect(x, midY - coreH / 2, barWidth, coreH);
+                              }
 
-              // Center baseline reference
-                            ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
-                            ctx.beginPath();
-                            ctx.moveTo(0, midY);
-                            ctx.lineTo(width, midY);
-                            ctx.stroke();
-                          }
+                              // Center baseline reference
+                                            ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)';
+                                            ctx.beginPath();
+                                            ctx.moveTo(0, midY);
+                                            ctx.lineTo(width, midY);
+                                            ctx.stroke();
+                                          }
 
     // Export Mockup
     btnExport.addEventListener('click', () => {
@@ -1326,10 +1328,16 @@
           uploadScreen.classList.add('active');
         }
 
-    // Setup CSS for spinner
-    const style = document.createElement('style');
-    style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
-    document.head.appendChild(style);
-  </script>
-</body>
-</html>
+    // Theme Toggle Logic
+        document.getElementById('btnThemeToggle').addEventListener('click', () => {
+          document.documentElement.classList.toggle('dark-mode');
+          if (duration) drawProceduralWaveform();
+        });
+
+        // Setup CSS for spinner
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+        document.head.appendChild(style);
+      </script>
+    </body>
+    </html>
