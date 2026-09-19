@@ -70,18 +70,18 @@
       text-align: center;
     }
     h1 {
-          font-size: 15px;
-          font-weight: 600;
-          letter-spacing: -0.2px;
-          color: #000000;
-          -webkit-text-fill-color: #000000;
-          margin-bottom: 4px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 100%;
-          padding: 0 10px;
-        }
+              font-size: 11px;
+              font-weight: 500;
+              letter-spacing: -0.1px;
+              color: #000000;
+              -webkit-text-fill-color: #000000;
+              margin-bottom: 4px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              max-width: 100%;
+              padding: 0 10px;
+            }
 
     /* Screens */
     .screen {
@@ -957,28 +957,12 @@
               }
 
               // Center baseline reference
-              ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
-              ctx.beginPath();
-              ctx.moveTo(0, midY);
-              ctx.lineTo(width, midY);
-              ctx.stroke();
-            }
-              barHeight = Math.max(4, Math.min(1, peak * 1.6) * height * 0.85);
-            } else {
-              // Placeholder look until the real audio has finished decoding
-              let noise = Math.sin(i * 0.2) * Math.cos(i * 0.5) * Math.sin(i * 0.05);
-              noise = Math.abs(noise);
-              noise += 0.1;
-              barHeight = Math.max(8, noise * height * 0.8);
-            }
-            const x = i * (barWidth + barGap);
-            const y = midY - (barHeight / 2);
-        
-            ctx.beginPath();
-            ctx.roundRect(x, y, barWidth, barHeight, 4);
-            ctx.fill();
-          }
-        }
+                            ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+                            ctx.beginPath();
+                            ctx.moveTo(0, midY);
+                            ctx.lineTo(width, midY);
+                            ctx.stroke();
+                          }
 
     // Export Mockup
     btnExport.addEventListener('click', () => {
