@@ -93,25 +93,44 @@
                 }
 
             /* Main App Container */
-                .app-container {
-                      width: 100%;
-                      height: auto;
-                      max-height: 100%;
-                      max-width: 420px;
-                      background: var(--bg-color);
-                      border: none;
-                      border-radius: 32px;
-                      box-shadow: var(--neu-shadow);
-                      padding: 32px 24px;
-                      display: flex;
-                      flex-direction: column;
-                      justify-content: center;
-                      gap: 24px;
-                      overflow-y: auto;
-                      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                    }
+                    .app-container {
+                          width: 100%;
+                          height: auto;
+                          max-height: 100%;
+                          max-width: 420px;
+                          background: var(--bg-color);
+                          border: none;
+                          border-radius: 32px;
+                          box-shadow: var(--neu-shadow);
+                          padding: 32px 24px;
+                          display: flex;
+                          flex-direction: column;
+                          justify-content: center;
+                          gap: 24px;
+                          overflow-y: auto;
+                          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                        }
 
-    /* Header */
+                /* Glassmorphism for Wallpaper Mode */
+                .app-container.glass-active {
+                  background: rgba(255, 255, 255, 0.25);
+                  backdrop-filter: blur(24px);
+                  -webkit-backdrop-filter: blur(24px);
+                  border: 1px solid rgba(255, 255, 255, 0.3);
+                  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                }
+                :root.dark-mode .app-container.glass-active {
+                  background: rgba(30, 10, 10, 0.4);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+                }
+                body.has-wallpaper {
+                  background-size: cover;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                }
+
+                /* Header */
     header {
       text-align: center;
     }
@@ -165,17 +184,17 @@
           box-shadow: inset 8px 8px 12px 0 rgba(163,177,198, 0.8), inset -8px -8px 12px 0 rgba(255,255,255, 0.9);
         }
         .upload-icon {
-          width: 64px;
-          height: 64px;
-          background: var(--bg-color);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: var(--neu-shadow-sm);
-          color: var(--accent);
-          margin-bottom: 8px;
-        }
+                  width: 64px;
+                  height: 64px;
+                  background: transparent;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  box-shadow: none;
+                  color: var(--accent);
+                  margin-bottom: 8px;
+                }
     .upload-text {
       font-size: 14px;
       font-weight: 600;
@@ -294,25 +313,18 @@
                       width: 34px;
                       height: 34px;
                       border-radius: 50%;
-                      background: var(--bg-color);
+                      background: transparent;
                       border: none;
                       color: var(--text-main);
                       font-size: 16px;
                       font-weight: 700;
                       line-height: 1;
                       cursor: pointer;
-                      box-shadow: 4px 4px 8px rgb(163,177,198,0.5), -4px -4px 8px rgba(255,255,255, 0.5);
+                      box-shadow: none;
                       transition: all 0.2s ease;
                     }
                     .zoom-btn:active {
-                      box-shadow: inset 3px 3px 6px 0 rgba(163,177,198, 0.6), inset -3px -3px 6px 0 rgba(255,255,255, 0.7);
-                    }
-        
-                    :root.dark-mode .zoom-btn {
-                      box-shadow: 0 0 16px rgba(0, 0, 0, 0.4);
-                    }
-                    :root.dark-mode .zoom-btn:active {
-                      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
+                      transform: scale(0.9);
                     }
         .zoom-label {
           font-size: 11px;
@@ -434,34 +446,36 @@
                                               line-height: 1;
                                             }
                                             .btn-nudge {
-                                              width: 24px;
-                                              height: 24px;
-                        border-radius: 50%;
-                        border: none;
-                        background: var(--bg-color);
-                        box-shadow: var(--neu-shadow-sm);
-                        font-size: 11px;
-                        font-weight: 700;
-                        color: #000;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                      }
-                      .btn-nudge:active {
-                        box-shadow: var(--neu-inset-sm);
-                      }
-                      .duration-badge {
-                            background: var(--bg-color);
-                            padding: 6px 14px;
-                            border-radius: 999px;
-                            color: #000000;
-                            box-shadow: var(--neu-shadow-sm);
-                          }
-                      .btn-toggle.active {
-                        box-shadow: var(--neu-inset-sm) !important;
-                        color: var(--accent);
-                      }
+                                                                    width: 24px;
+                                                                    height: 24px;
+                                                                    border-radius: 50%;
+                                                                    border: none;
+                                                                    background: transparent;
+                                                                    box-shadow: none;
+                                                                    font-size: 11px;
+                                                                    font-weight: 700;
+                                                                    color: #000;
+                                                                    cursor: pointer;
+                                                                    display: flex;
+                                                                    align-items: center;
+                                                                    justify-content: center;
+                                                                    transition: transform 0.2s ease;
+                                                                  }
+                                                                  .btn-nudge:active {
+                                                                    transform: scale(0.85);
+                                                                  }
+                                                                  .duration-badge {
+                                                                                              background: transparent;
+                                                                                              padding: 6px 14px;
+                                                                                              border-radius: 999px;
+                                                                                              color: #000000;
+                                                                                              box-shadow: none;
+                                                                                            }
+                                                                  .btn-toggle.active {
+                                                                    box-shadow: none !important;
+                                                                    color: var(--accent);
+                                                                    transform: scale(0.9);
+                                                                  }
                       .gain-panel {
                         display: flex;
                         align-items: center;
@@ -486,23 +500,25 @@
           gap: 24px;
         }
         .btn-icon {
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          background: var(--bg-color);
-          border: none;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          color: var(--text-main);
-          box-shadow: var(--neu-shadow);
-          transition: all 0.2s ease;
-        }
-        .btn-icon:active {
-          box-shadow: var(--neu-inset-sm);
-          transform: scale(0.95);
-        }
+                  width: 50px;
+                  height: 50px;
+                  border-radius: 50%;
+                  background: transparent;
+                  border: none;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                  color: var(--text-main);
+                  box-shadow: none;
+                  transition: all 0.2s ease;
+                }
+                .btn-icon:active {
+                  transform: scale(0.9);
+                }
+                .btn-icon:active {
+                  transform: scale(0.9);
+                }
         .btn-icon.play-btn {
           width: 64px;
           height: 64px;
@@ -513,27 +529,29 @@
         }
 
         /* Export Button */
-            .btn-primary {
-              width: 100%;
-              padding: 16px;
-              border-radius: 16px;
-              background: var(--bg-color);
-              border: none;
-              color: #000000;
-              font-size: 14px;
-              font-weight: 700;
-              cursor: pointer;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 8px;
-              transition: all 0.2s ease;
-              box-shadow: var(--neu-shadow);
-            }
-        .btn-primary:active {
-          box-shadow: var(--neu-inset);
-          transform: translateY(2px);
-        }
+                    .btn-primary {
+                      width: 100%;
+                      padding: 16px;
+                      border-radius: 16px;
+                      background: transparent;
+                      border: none;
+                      color: #000000;
+                      font-size: 14px;
+                      font-weight: 700;
+                      cursor: pointer;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      gap: 8px;
+                      transition: all 0.2s ease;
+                      box-shadow: none;
+                    }
+                .btn-primary:active {
+                  transform: scale(0.96);
+                }
+                .btn-primary:active {
+                  transform: scale(0.96);
+                }
 
     /* Reset Button */
         .btn-text {
@@ -643,11 +661,17 @@
 
   <main class="app-container">
       <header style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
-            <h1 id="trackTitle" style="margin: 0; padding: 0;">Select Media</h1>
-            <button class="btn-icon" id="btnThemeToggle" style="width: 32px; height: 32px; min-width: 32px; box-shadow: var(--neu-shadow-sm);" title="Toggle Dark Mode">
-              <svg width="14" height="14" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            </button>
-          </header>
+                <h1 id="trackTitle" style="margin: 0; padding: 0; text-align: left; flex: 1;">Select Media</h1>
+                <div style="display: flex; gap: 8px;">
+                  <input type="file" id="wallpaperInput" accept="image/*" style="display: none;">
+                  <button class="btn-icon" id="btnWallpaper" style="width: 32px; height: 32px; min-width: 32px; box-shadow: var(--neu-shadow-sm);" title="Set Wallpaper">
+                    <svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  </button>
+                  <button class="btn-icon" id="btnThemeToggle" style="width: 32px; height: 32px; min-width: 32px; box-shadow: var(--neu-shadow-sm);" title="Toggle Dark Mode">
+                    <svg width="14" height="14" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                  </button>
+                </div>
+              </header>
 
       <!-- SCREEN 1: UPLOAD -->
     <section id="uploadScreen" class="screen active">
@@ -1338,7 +1362,25 @@
           uploadScreen.classList.add('active');
         }
 
-    // Theme Toggle Logic
+    // Wallpaper Logic
+        const wallpaperInput = document.getElementById('wallpaperInput');
+        const btnWallpaper = document.getElementById('btnWallpaper');
+        const appContainer = document.querySelector('.app-container');
+
+        btnWallpaper.addEventListener('click', () => {
+          wallpaperInput.click();
+        });
+
+        wallpaperInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const objectUrl = URL.createObjectURL(file);
+          document.body.style.backgroundImage = `url(${objectUrl})`;
+          document.body.classList.add('has-wallpaper');
+          appContainer.classList.add('glass-active');
+        });
+
+        // Theme Toggle Logic
         document.getElementById('btnThemeToggle').addEventListener('click', () => {
           document.documentElement.classList.toggle('dark-mode');
           if (duration) drawProceduralWaveform();
