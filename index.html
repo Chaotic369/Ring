@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- Forces a fixed 400px logical width to override developer option DPI scaling -->
+  <meta name="viewport" content="width=400, user-scalable=no, viewport-fit=cover">
   <title>Aesthetic Ringtone Cutter</title>
   <style>
     :root {
@@ -1286,24 +1287,39 @@
             source.start(0, startVal, durationCut);
         
             const renderedBuffer = await offlineCtx.startRendering();
-            const wavBlob = audioBufferToWav(renderedBuffer);
+                    const wavBlob = audioBufferToWav(renderedBuffer);
+                    const filename = `ringtone_${currentFile.name.replace(/\.[^/.]+$/, "")}.wav`;
         
-            const url = URL.createObjectURL(wavBlob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `ringtone_${currentFile.name.replace(/\.[^/.]+$/, "")}.wav`;
-            document.body.appendChild(a);
-            a.click();
+                    // Strategy 1: Native Android Share Sheet (Best for Cordova/WebViews)
+                    const fileToSave = new File([wavBlob], filename, { type: 'audio/wav' });
         
-            setTimeout(() => {
-              document.body.removeChild(a);
-              window.URL.revokeObjectURL(url);
-            }, 100);
+                    if (navigator.canShare && navigator.canShare({ files: [fileToSave] })) {
+                      try {
+                        await navigator.share({
+                          title: 'Exported Ringtone',
+                          files: [fileToSave]
+                        });
+                      } catch (shareErr) {
+                        console.log("Share cancelled or failed", shareErr);
+                      }
+                    } else {
+                      // Strategy 2: Base64 Data URI Fallback (Bypasses Cordova blob restrictions)
+                      const reader = new FileReader();
+                      reader.readAsDataURL(wavBlob);
+                      reader.onloadend = function() {
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = reader.result;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        setTimeout(() => document.body.removeChild(a), 100);
+                      };
+                    }
         
-            btnExport.innerHTML = btnOrigText;
-            btnExport.style.pointerEvents = 'auto';
-          } catch (err) {
+                    btnExport.innerHTML = btnOrigText;
+                    btnExport.style.pointerEvents = 'auto';
+                  } catch (err) {
             console.error(err);
             alert("Error exporting audio: " + err.message);
             btnExport.innerHTML = btnOrigText;
