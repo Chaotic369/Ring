@@ -746,10 +746,11 @@
     const btnExport = document.getElementById('btnExport');
 
     let duration = 0;
-        let isPlaying = false;
-        let animationFrame;
+            let isPlaying = false;
+            let animationFrame;
+            let currentFile = null;
 
-        const timelineScroll = document.getElementById('timelineScroll');
+            const timelineScroll = document.getElementById('timelineScroll');
         const timelineInner = document.getElementById('timelineInner');
         const timeRuler = document.getElementById('timeRuler');
         const playhead = document.getElementById('playhead');
@@ -785,11 +786,12 @@
                 timelineScroll.addEventListener('touchmove', markTimelineInteraction, {passive: true});
 
     // File Upload Handler
-        fileInput.addEventListener('change', function(e) {
-          const file = e.target.files[0];
-          if (!file) return;
+            fileInput.addEventListener('change', function(e) {
+              const file = e.target.files[0];
+              if (!file) return;
+              currentFile = file;
 
-          document.getElementById('trackTitle').innerText = file.name;
+              document.getElementById('trackTitle').innerText = file.name;
 
           const objectUrl = URL.createObjectURL(file);
                 media.src = objectUrl;
@@ -1249,17 +1251,107 @@
                                             ctx.stroke();
                                           }
 
-    // Export Mockup
-    btnExport.addEventListener('click', () => {
-      const btnOrigText = btnExport.innerHTML;
-      btnExport.innerHTML = `<svg class="spinner" width="18" height="18" viewBox="0 0 24 24" style="animation: spin 1s linear infinite;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg> Processing...`;
+    // Real Client-Side Audio Export
+        btnExport.addEventListener('click', async () => {
+          if (!currentFile) return;
+          const btnOrigText = btnExport.innerHTML;
+          btnExport.innerHTML = `<svg class="spinner" width="18" height="18" viewBox="0 0 24 24" style="animation: spin 1s linear infinite;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg> Exporting Audio...`;
+          btnExport.style.pointerEvents = 'none';
       
-      // Simulate export delay
-      setTimeout(() => {
-        btnExport.innerHTML = btnOrigText;
-        alert(`Success! Ringtone cut from ${timeStartEl.innerText} to ${timeEndEl.innerText}.\n\n(In the Native Android version, this will trigger FFmpeg to slice the file and open the system Ringtone Setter.)`);
-      }, 1500);
-    });
+          try {
+            const startVal = parseFloat(sliderStart.value);
+            const endVal = parseFloat(sliderEnd.value);
+            const durationCut = endVal - startVal;
+        
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioContextClass();
+            const arrayBuffer = await currentFile.arrayBuffer();
+            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+        
+            const offlineCtx = new OfflineAudioContext(
+              audioBuffer.numberOfChannels,
+              Math.ceil(durationCut * audioBuffer.sampleRate),
+              audioBuffer.sampleRate
+            );
+        
+            const source = offlineCtx.createBufferSource();
+            source.buffer = audioBuffer;
+        
+            const gainNode = offlineCtx.createGain();
+            gainNode.gain.value = parseFloat(document.getElementById('gainSlider').value) || 1;
+        
+            source.connect(gainNode);
+            gainNode.connect(offlineCtx.destination);
+        
+            source.start(0, startVal, durationCut);
+        
+            const renderedBuffer = await offlineCtx.startRendering();
+            const wavBlob = audioBufferToWav(renderedBuffer);
+        
+            const url = URL.createObjectURL(wavBlob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `ringtone_${currentFile.name.replace(/\.[^/.]+$/, "")}.wav`;
+            document.body.appendChild(a);
+            a.click();
+        
+            setTimeout(() => {
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);
+            }, 100);
+        
+            btnExport.innerHTML = btnOrigText;
+            btnExport.style.pointerEvents = 'auto';
+          } catch (err) {
+            console.error(err);
+            alert("Error exporting audio: " + err.message);
+            btnExport.innerHTML = btnOrigText;
+            btnExport.style.pointerEvents = 'auto';
+          }
+        });
+
+        function audioBufferToWav(buffer) {
+          const numOfChan = buffer.numberOfChannels;
+          const length = buffer.length * numOfChan * 2 + 44;
+          const bufferArr = new ArrayBuffer(length);
+          const view = new DataView(bufferArr);
+          const channels = [];
+          let i, sample, offset = 0, pos = 0;
+
+          function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+          function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+
+          setUint32(0x46464952); // "RIFF"
+          setUint32(length - 8); // file length - 8
+          setUint32(0x45564157); // "WAVE"
+          setUint32(0x20746d66); // "fmt " chunk
+          setUint32(16); // length = 16
+          setUint16(1); // PCM (uncompressed)
+          setUint16(numOfChan);
+          setUint32(buffer.sampleRate);
+          setUint32(buffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
+          setUint16(numOfChan * 2); // block-align
+          setUint16(16); // 16-bit (hardcoded)
+          setUint32(0x61746164); // "data" - chunk
+          setUint32(length - pos - 4); // chunk length
+
+          for (i = 0; i < buffer.numberOfChannels; i++) {
+            channels.push(buffer.getChannelData(i));
+          }
+
+          while (pos < length) {
+            for (i = 0; i < numOfChan; i++) {
+              sample = Math.max(-1, Math.min(1, channels[i][offset]));
+              sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
+              view.setInt16(pos, sample, true);
+              pos += 2;
+            }
+            offset++;
+          }
+
+          return new Blob([bufferArr], { type: "audio/wav" });
+        }
 
     // Reset App Modal Logic
         const resetModal = document.getElementById('resetModal');
@@ -1273,13 +1365,14 @@
         }
 
         function confirmResetApp() {
-          closeResetModal();
+                  closeResetModal();
       
-          media.pause();
-                media.removeAttribute('src');
-                fileInput.value = '';
-                document.getElementById('trackTitle').innerText = 'Select Media';
-                waveformPeaks = null;
+                  media.pause();
+                        media.removeAttribute('src');
+                        fileInput.value = '';
+                        currentFile = null;
+                        document.getElementById('trackTitle').innerText = 'Select Media';
+                        waveformPeaks = null;
                 zoomLevel = 1;
                 duration = 0;
                 isPlaying = false;
