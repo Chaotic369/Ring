@@ -683,10 +683,22 @@
 
       <button class="btn-text" onclick="resetApp()">Start Over</button>
 
-    </section>
-  </main>
+          </section>
 
-  <script>
+          <!-- Reset Modal -->
+          <div id="resetModal" class="modal-overlay">
+            <div class="modal-box">
+              <h3>Start Over?</h3>
+              <p>All unsaved progress will be lost.</p>
+              <div class="modal-actions">
+                <button class="btn-modal btn-cancel" onclick="closeResetModal()">Cancel</button>
+                <button class="btn-modal btn-confirm" onclick="confirmResetApp()">Start Over</button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <script>
     const fileInput = document.getElementById('fileInput');
     const uploadScreen = document.getElementById('uploadScreen');
     const editorScreen = document.getElementById('editorScreen');
@@ -1217,25 +1229,35 @@
       }, 1500);
     });
 
-    // Reset App
-            function resetApp() {
-              if (!confirm("Are you sure you want to start over? All unsaved progress will be lost.")) return;
-          
-              media.pause();
-                    media.removeAttribute('src');
-                    fileInput.value = '';
-                document.getElementById('trackTitle').innerText = 'Select Media';
-            waveformPeaks = null;
-            zoomLevel = 1;
-            duration = 0;
-            isPlaying = false;
-      playIcon.style.display = 'block';
-      pauseIcon.style.display = 'none';
-      cancelAnimationFrame(animationFrame);
+    // Reset App Modal Logic
+        const resetModal = document.getElementById('resetModal');
+
+        function resetApp() {
+          resetModal.classList.add('active');
+        }
+
+        function closeResetModal() {
+          resetModal.classList.remove('active');
+        }
+
+        function confirmResetApp() {
+          closeResetModal();
       
-      editorScreen.classList.remove('active');
-      uploadScreen.classList.add('active');
-    }
+          media.pause();
+                media.removeAttribute('src');
+                fileInput.value = '';
+                document.getElementById('trackTitle').innerText = 'Select Media';
+                waveformPeaks = null;
+                zoomLevel = 1;
+                duration = 0;
+                isPlaying = false;
+          playIcon.style.display = 'block';
+          pauseIcon.style.display = 'none';
+          cancelAnimationFrame(animationFrame);
+      
+          editorScreen.classList.remove('active');
+          uploadScreen.classList.add('active');
+        }
 
     // Setup CSS for spinner
     const style = document.createElement('style');
