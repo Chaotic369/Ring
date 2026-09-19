@@ -730,16 +730,16 @@
                     </div>
 
                     <!-- Save Success Modal -->
-                    <div id="saveModal" class="modal-overlay">
-                      <div class="modal-box">
-                        <h3>File Saved!</h3>
-                        <p>Your ringtone has been exported successfully.</p>
-                        <div class="modal-actions">
-                          <button class="btn-modal btn-cancel" onclick="closeSaveModal()">Later</button>
-                          <button class="btn-modal btn-success" onclick="promptSetRingtone()">Set Ringtone</button>
-                        </div>
-                      </div>
-                    </div>
+                              <div id="saveModal" class="modal-overlay">
+                                <div class="modal-box">
+                                  <h3>Export Complete</h3>
+                                  <p id="savePathText" style="word-break: break-all;">Your ringtone has been exported.</p>
+                                  <div class="modal-actions">
+                                    <button class="btn-modal btn-cancel" onclick="closeSaveModal()">Close</button>
+                                    <button class="btn-modal btn-success" onclick="openFileManager()">Open Files</button>
+                                  </div>
+                                </div>
+                              </div>
                   </main>
 
         <script>
@@ -1315,7 +1315,7 @@
                                   title: 'Exported Ringtone',
                                   files: [fileToSave]
                                 });
-                                showSaveModal();
+                                showSaveModal(filename, 'share');
                               } catch (shareErr) {
                                 console.log("Share cancelled or failed", shareErr);
                               }
@@ -1332,7 +1332,7 @@
                                 a.click();
                                 setTimeout(() => {
                                   document.body.removeChild(a);
-                                  showSaveModal();
+                                  showSaveModal(filename, 'download');
                                 }, 100);
                               };
                             }
@@ -1392,7 +1392,13 @@
     // Save Success Modal Logic
         const saveModal = document.getElementById('saveModal');
 
-        function showSaveModal() {
+        function showSaveModal(filename, method) {
+          const pathText = document.getElementById('savePathText');
+          if (method === 'share') {
+            pathText.innerHTML = `Saved via Share Menu as:<br><br><b>${filename}</b>`;
+          } else {
+            pathText.innerHTML = `Saved to Downloads folder as:<br><br><b>${filename}</b>`;
+          }
           saveModal.classList.add('active');
         }
 
@@ -1400,9 +1406,10 @@
           saveModal.classList.remove('active');
         }
 
-        function promptSetRingtone() {
+        function openFileManager() {
           closeSaveModal();
-          alert("To set this as your ringtone:\n\n1. Open your phone's Settings.\n2. Go to Sound & Vibration > Ringtone.\n3. Tap 'Custom' or '+' and select the file you just saved.");
+          // Uses a native Android Intent to open the System File Picker / Audio files
+          window.location.href = "intent://#Intent;action=android.intent.action.GET_CONTENT;type=audio/*;end;";
         }
 
         // Reset App Modal Logic
