@@ -26,17 +26,23 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-    }
+    html, body {
+          width: 100%;
+          height: 100%;
+        }
+
+        body {
+          background-color: var(--bg-color);
+          color: var(--text-main);
+          min-height: 100vh;
+          min-height: 100dvh;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          justify-content: stretch;
+          overflow: hidden;
+          position: relative;
+        }
 
     /* Abstract Bright Background Blobs */
     .blob {
@@ -78,20 +84,25 @@
 
     /* Main App Container */
     .app-container {
-      width: 90%;
-      max-width: 480px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--glass-border);
-      border-radius: 32px;
-      box-shadow: var(--glass-shadow);
-      padding: 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+          width: 100%;
+          height: 100%;
+          max-width: none;
+          background: var(--glass-bg);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border: none;
+          border-radius: 0;
+          box-shadow: none;
+          padding: 24px 20px;
+          padding-top: max(24px, env(safe-area-inset-top));
+          padding-bottom: max(24px, env(safe-area-inset-bottom));
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 24px;
+          overflow-y: auto;
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
     /* Header */
     header {
@@ -170,18 +181,108 @@
 
     /* Editor Screen */
     .media-preview-container {
-      width: 100%;
-      height: 80px;
-      border-radius: 16px;
-      overflow: hidden;
-      position: relative;
-      background: rgba(255,255,255,0.3);
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
-      border: 1px solid var(--glass-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+          width: 100%;
+          height: 180px;
+          border-radius: 16px;
+          overflow: hidden;
+          position: relative;
+          background: rgba(255,255,255,0.3);
+          box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+          border: 1px solid var(--glass-border);
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Zoomable, scrollable timeline viewport */
+        .timeline-scroll {
+          position: relative;
+          flex: 1;
+          overflow-x: auto;
+          overflow-y: hidden;
+          touch-action: pan-x;
+          scrollbar-width: thin;
+          -webkit-overflow-scrolling: touch;
+        }
+        .timeline-inner {
+          position: relative;
+          height: 100%;
+          width: 100%;
+        }
+        .time-ruler {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 18px;
+          pointer-events: none;
+        }
+        .ruler-tick {
+          position: absolute;
+          top: 0;
+          height: 8px;
+          border-left: 1px solid rgba(100, 116, 139, 0.45);
+        }
+        .ruler-label {
+          position: absolute;
+          top: 6px;
+          font-size: 9px;
+          font-weight: 600;
+          color: var(--text-muted);
+          transform: translateX(3px);
+          font-variant-numeric: tabular-nums;
+          white-space: nowrap;
+        }
+        .playhead {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 2px;
+          background: #ef4444;
+          box-shadow: 0 0 6px rgba(239, 68, 68, 0.7);
+          pointer-events: none;
+          z-index: 5;
+          left: 0;
+        }
+        .playhead::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -4px;
+          width: 10px;
+          height: 10px;
+          background: #ef4444;
+          border-radius: 50%;
+        }
+        .zoom-controls {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 6px 0;
+          border-top: 1px solid var(--glass-border);
+          background: rgba(255, 255, 255, 0.35);
+        }
+        .zoom-btn {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background: #fff;
+          border: 1px solid var(--glass-border);
+          color: var(--text-main);
+          font-size: 16px;
+          font-weight: 700;
+          line-height: 1;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .zoom-label {
+          font-size: 11px;
+          font-weight: 600;
+          color: var(--text-muted);
+          min-width: 44px;
+          text-align: center;
+          font-variant-numeric: tabular-nums;
+        }
     /* Hidden media elements used for processing */
     #sourceMedia {
       position: absolute;
@@ -195,11 +296,13 @@
     
     /* Custom Waveform & Trimmer */
     .trimmer-wrapper {
-      position: relative;
-      height: 60px;
-      width: 100%;
-      z-index: 1;
-    }
+          position: absolute;
+          top: 18px;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 1;
+        }
     canvas#waveform {
       width: 100%;
       height: 100%;
@@ -244,26 +347,26 @@
       -webkit-appearance: none;
       pointer-events: auto;
       width: 16px;
-      height: 70px; /* Taller than container for easy grabbing */
-      background: #fff;
-      border: 2px solid var(--accent);
-      border-radius: 8px;
-      cursor: ew-resize;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      margin-top: -5px;
-    }
+            height: 160px; /* Tall handle for easy grabbing */
+            background: #fff;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            cursor: ew-resize;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-top: 0;
+          }
     input[type=range]::-moz-range-thumb {
       pointer-events: auto;
       width: 16px;
-      height: 70px;
-      background: #fff;
-      border: 2px solid var(--accent);
-      border-radius: 8px;
-      cursor: ew-resize;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
+            height: 160px;
+            background: #fff;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            cursor: ew-resize;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          }
 
-    /* Time Info */
+          /* Time Info */
     .time-info {
       display: flex;
       justify-content: space-between;
@@ -398,19 +501,31 @@
     <section id="editorScreen" class="screen">
       
       <div class="media-preview-container">
-        <!-- We use a video element so it natively handles both audio and video files -->
-        <video id="sourceMedia" playsinline></video>
+              <!-- We use a video element so it natively handles both audio and video files -->
+              <video id="sourceMedia" playsinline></video>
         
-        <div class="trimmer-wrapper">
-          <canvas id="waveform"></canvas>
-          <div id="selectionOverlay" class="selection-overlay"></div>
-          
-          <div class="range-track">
-            <input type="range" id="sliderStart" min="0" max="100" value="0" step="0.1">
-            <input type="range" id="sliderEnd" min="0" max="100" value="30" step="0.1">
-          </div>
-        </div>
-      </div>
+              <div class="timeline-scroll" id="timelineScroll">
+                <div class="timeline-inner" id="timelineInner">
+                  <div class="time-ruler" id="timeRuler"></div>
+                  <div class="trimmer-wrapper">
+                    <canvas id="waveform"></canvas>
+                    <div id="selectionOverlay" class="selection-overlay"></div>
+              
+                    <div class="range-track">
+                      <input type="range" id="sliderStart" min="0" max="100" value="0" step="0.1">
+                      <input type="range" id="sliderEnd" min="0" max="100" value="30" step="0.1">
+                    </div>
+                  </div>
+                  <div class="playhead" id="playhead"></div>
+                </div>
+              </div>
+
+              <div class="zoom-controls">
+                <button class="zoom-btn" id="btnZoomOut" title="Zoom out">−</button>
+                <span class="zoom-label" id="zoomLabel">1x</span>
+                <button class="zoom-btn" id="btnZoomIn" title="Zoom in">+</button>
+              </div>
+            </div>
 
       <div class="time-info">
         <span id="timeStart">00:00</span>
@@ -459,8 +574,21 @@
     const btnExport = document.getElementById('btnExport');
 
     let duration = 0;
-    let isPlaying = false;
-    let animationFrame;
+        let isPlaying = false;
+        let animationFrame;
+
+        const timelineScroll = document.getElementById('timelineScroll');
+        const timelineInner = document.getElementById('timelineInner');
+        const timeRuler = document.getElementById('timeRuler');
+        const playhead = document.getElementById('playhead');
+        const zoomLabel = document.getElementById('zoomLabel');
+        const btnZoomIn = document.getElementById('btnZoomIn');
+        const btnZoomOut = document.getElementById('btnZoomOut');
+
+        let zoomLevel = 1;
+        const MIN_ZOOM = 1;
+        const MAX_ZOOM = 40;
+        let waveformPeaks = null; // Real decoded audio peaks (null until decoded)
 
     // File Upload Handler
     fileInput.addEventListener('change', function(e) {
@@ -478,33 +606,46 @@
       }
 
       media.onloadedmetadata = () => {
-        duration = media.duration;
+              duration = media.duration;
         
-        // Setup Sliders
-        sliderStart.max = duration;
-        sliderEnd.max = duration;
+              // Setup Sliders
+              sliderStart.max = duration;
+              sliderEnd.max = duration;
         
-        // Default selection: up to 30 seconds
-        sliderStart.value = 0;
-        sliderEnd.value = Math.min(30, duration);
+              // Default selection: up to 30 seconds
+              sliderStart.value = 0;
+              sliderEnd.value = Math.min(30, duration);
         
-        updateUI();
-        drawProceduralWaveform();
-        
-        uploadScreen.classList.remove('active');
-        editorScreen.classList.add('active');
-      };
-    });
+              uploadScreen.classList.remove('active');
+              editorScreen.classList.add('active');
+
+              zoomLevel = 1;
+              waveformPeaks = null;
+              applyZoom();
+              updateUI();
+              drawProceduralWaveform();
+              decodeRealWaveform(file);
+              updatePlayhead();
+
+              // Request full screen on first file pick (needs a user gesture; ignored if unsupported)
+              try {
+                const root = document.documentElement;
+                if (!document.fullscreenElement && root.requestFullscreen) {
+                  root.requestFullscreen().catch(() => {});
+                }
+              } catch (err) {}
+            };
+          });
 
     // Slider Logic (Prevent cross-over)
     const minGap = 1.0; // minimum 1 second ringtone
 
     function updateUI() {
-      let startVal = parseFloat(sliderStart.value);
-      let endVal = parseFloat(sliderEnd.value);
+          let startVal = parseFloat(sliderStart.value);
+          let endVal = parseFloat(sliderEnd.value);
 
-      if (endVal - startVal <= minGap) {
-        if (this === sliderStart) {
+          if (endVal - startVal <= minGap) {
+            if (this === sliderStart) {
           sliderStart.value = endVal - minGap;
           startVal = parseFloat(sliderStart.value);
         } else {
@@ -558,18 +699,164 @@
     }
 
     function trackPlayback() {
-      if (!isPlaying) return;
+          if (!isPlaying) return;
       
-      const endVal = parseFloat(sliderEnd.value);
-      const startVal = parseFloat(sliderStart.value);
+          const endVal = parseFloat(sliderEnd.value);
+          const startVal = parseFloat(sliderStart.value);
       
-      // Loop back to start when reaching the end of selection
-      if (media.currentTime >= endVal) {
-        media.currentTime = startVal;
-      }
+          // Loop back to start when reaching the end of selection
+          if (media.currentTime >= endVal) {
+            media.currentTime = startVal;
+          }
+
+          updatePlayhead();
+          followPlayhead();
       
-      animationFrame = requestAnimationFrame(trackPlayback);
-    }
+          animationFrame = requestAnimationFrame(trackPlayback);
+        }
+
+        // Moves the red playback line to the current time
+        function updatePlayhead() {
+          if (!duration) return;
+          const pct = (media.currentTime / duration) * 100;
+          playhead.style.left = pct + '%';
+        }
+
+        // Keeps the playhead visible by auto-scrolling the timeline while playing
+        function followPlayhead() {
+          const inner = timelineInner.offsetWidth;
+          const view = timelineScroll.clientWidth;
+          if (inner <= view) return;
+          const x = (media.currentTime / duration) * inner;
+          const left = timelineScroll.scrollLeft;
+          if (x < left + 20 || x > left + view - 40) {
+            timelineScroll.scrollLeft = Math.max(0, x - view * 0.3);
+          }
+        }
+
+        // Zoom: widens the inner timeline; the scroll container makes it scrollable
+        function applyZoom(anchorTime) {
+          const view = timelineScroll.clientWidth;
+          const prevInner = timelineInner.offsetWidth || view;
+          const anchorPct = (typeof anchorTime === 'number' && duration) ? anchorTime / duration : null;
+          const anchorScreenX = anchorPct !== null ? (anchorPct * prevInner - timelineScroll.scrollLeft) : 0;
+
+          timelineInner.style.width = (100 * zoomLevel) + '%';
+          zoomLabel.textContent = (Math.round(zoomLevel * 10) / 10) + 'x';
+
+          if (anchorPct !== null) {
+            timelineScroll.scrollLeft = Math.max(0, anchorPct * timelineInner.offsetWidth - anchorScreenX);
+          }
+
+          drawRuler();
+          if (duration) drawProceduralWaveform();
+          updatePlayhead();
+        }
+
+        function setZoom(newZoom, anchorTime) {
+          zoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+          applyZoom(anchorTime);
+        }
+
+        btnZoomIn.addEventListener('click', () => setZoom(zoomLevel * 1.6, media.currentTime));
+        btnZoomOut.addEventListener('click', () => setZoom(zoomLevel / 1.6, media.currentTime));
+
+        // Pinch-to-zoom on touch screens
+        let pinchStartDist = 0;
+        let pinchStartZoom = 1;
+        timelineScroll.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 2) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            pinchStartDist = Math.sqrt(dx * dx + dy * dy);
+            pinchStartZoom = zoomLevel;
+          }
+        }, { passive: true });
+        timelineScroll.addEventListener('touchmove', (e) => {
+          if (e.touches.length === 2 && pinchStartDist > 0) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const rect = timelineScroll.getBoundingClientRect();
+            const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+            const anchorTime = ((timelineScroll.scrollLeft + midX) / timelineInner.offsetWidth) * duration;
+            setZoom(pinchStartZoom * (dist / pinchStartDist), anchorTime);
+            e.preventDefault();
+          }
+        }, { passive: false });
+        timelineScroll.addEventListener('touchend', () => { pinchStartDist = 0; }, { passive: true });
+
+        // Ctrl/Cmd + wheel zoom on desktop
+        timelineScroll.addEventListener('wheel', (e) => {
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            const rect = timelineScroll.getBoundingClientRect();
+            const anchorTime = ((timelineScroll.scrollLeft + (e.clientX - rect.left)) / timelineInner.offsetWidth) * duration;
+            setZoom(zoomLevel * (e.deltaY < 0 ? 1.15 : 1 / 1.15), anchorTime);
+          }
+        }, { passive: false });
+
+        // Draws time ticks and labels that adapt to the zoom level
+        function drawRuler() {
+          timeRuler.innerHTML = '';
+          if (!duration) return;
+          const steps = [0.1, 0.25, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300];
+          const pxPerSec = timelineInner.offsetWidth / duration;
+          let step = steps[steps.length - 1];
+          for (const s of steps) {
+            if (s * pxPerSec >= 60) { step = s; break; }
+          }
+          for (let t = 0; t <= duration; t += step) {
+            const tick = document.createElement('div');
+            tick.className = 'ruler-tick';
+            tick.style.left = ((t / duration) * 100) + '%';
+            timeRuler.appendChild(tick);
+            const label = document.createElement('div');
+            label.className = 'ruler-label';
+            label.style.left = ((t / duration) * 100) + '%';
+            label.textContent = step < 1 ? t.toFixed(1) + 's' : formatTime(t);
+            timeRuler.appendChild(label);
+          }
+        }
+
+        // Decodes the real audio so the graph shows the true waveform (falls back to procedural on failure)
+        function decodeRealWaveform(file) {
+          try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+              const audioCtx = new AudioCtx();
+              audioCtx.decodeAudioData(reader.result).then((buffer) => {
+                const data = buffer.getChannelData(0);
+                const bucketCount = 4000;
+                const block = Math.max(1, Math.floor(data.length / bucketCount));
+                const peaks = new Float32Array(bucketCount);
+                for (let i = 0; i < bucketCount; i++) {
+                  let max = 0;
+                  const startIdx = i * block;
+                  for (let j = 0; j < block; j += 8) {
+                    const v = Math.abs(data[startIdx + j] || 0);
+                    if (v > max) max = v;
+                  }
+                  peaks[i] = max;
+                }
+                waveformPeaks = peaks;
+                drawProceduralWaveform();
+                audioCtx.close().catch(() => {});
+              }).catch(() => {
+                audioCtx.close().catch(() => {});
+              });
+            };
+            reader.onerror = () => {};
+            reader.readAsArrayBuffer(file);
+          } catch (err) {}
+        }
+
+        // Keep the playhead in sync when scrubbing or while paused
+        media.addEventListener('timeupdate', updatePlayhead);
+        media.addEventListener('seeked', updatePlayhead);
+        window.addEventListener('resize', () => { if (duration) applyZoom(); });
 
     btnPlayPause.addEventListener('click', togglePlay);
     btnRewind.addEventListener('click', () => {
@@ -586,41 +873,49 @@
 
     // Procedural Aesthetic Waveform (Since extracting actual audio data requires WebAudio API decoding which takes time)
     function drawProceduralWaveform() {
-      const canvas = document.getElementById('waveform');
-      const ctx = canvas.getContext('2d');
-      canvas.width = canvas.offsetWidth * 2; // High DPI
-      canvas.height = canvas.offsetHeight * 2;
+          const canvas = document.getElementById('waveform');
+          const ctx = canvas.getContext('2d');
+          canvas.width = Math.min(canvas.offsetWidth * 2, 16000); // High DPI, capped for memory safety
+          canvas.height = canvas.offsetHeight * 2;
       
-      const width = canvas.width;
-      const height = canvas.height;
-      const midY = height / 2;
+          const width = canvas.width;
+          const height = canvas.height;
+          const midY = height / 2;
       
-      ctx.clearRect(0, 0, width, height);
+          ctx.clearRect(0, 0, width, height);
       
-      const barWidth = 6;
-      const barGap = 4;
-      const bars = Math.floor(width / (barWidth + barGap));
+          const barWidth = 6;
+          const barGap = 4;
+          const bars = Math.floor(width / (barWidth + barGap));
       
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+          ctx.fillStyle = waveformPeaks ? 'rgba(139, 92, 246, 0.75)' : 'rgba(255, 255, 255, 0.4)';
       
-      // Generate a nice looking random curve
-      for (let i = 0; i < bars; i++) {
-        // Pseudo-random height based on sine waves for a natural "audio" look
-        let noise = Math.sin(i * 0.2) * Math.cos(i * 0.5) * Math.sin(i * 0.05);
-        noise = Math.abs(noise);
+          for (let i = 0; i < bars; i++) {
+            let barHeight;
+            if (waveformPeaks) {
+              // Real audio: take the loudest peak inside this bar's slice of the timeline
+              const from = Math.floor((i / bars) * waveformPeaks.length);
+              const to = Math.max(from + 1, Math.floor(((i + 1) / bars) * waveformPeaks.length));
+              let peak = 0;
+              for (let k = from; k < to && k < waveformPeaks.length; k++) {
+                if (waveformPeaks[k] > peak) peak = waveformPeaks[k];
+              }
+              barHeight = Math.max(4, Math.min(1, peak * 1.6) * height * 0.85);
+            } else {
+              // Placeholder look until the real audio has finished decoding
+              let noise = Math.sin(i * 0.2) * Math.cos(i * 0.5) * Math.sin(i * 0.05);
+              noise = Math.abs(noise);
+              noise += 0.1;
+              barHeight = Math.max(8, noise * height * 0.8);
+            }
+            const x = i * (barWidth + barGap);
+            const y = midY - (barHeight / 2);
         
-        // Add some random noise
-        noise += Math.random() * 0.2;
-        
-        const barHeight = Math.max(8, noise * height * 0.8);
-        const x = i * (barWidth + barGap);
-        const y = midY - (barHeight / 2);
-        
-        ctx.beginPath();
-        ctx.roundRect(x, y, barWidth, barHeight, 4);
-        ctx.fill();
-      }
-    }
+            ctx.beginPath();
+            ctx.roundRect(x, y, barWidth, barHeight, 4);
+            ctx.fill();
+          }
+        }
 
     // Export Mockup
     btnExport.addEventListener('click', () => {
@@ -637,9 +932,12 @@
     // Reset App
     function resetApp() {
       media.pause();
-      media.removeAttribute('src');
-      fileInput.value = '';
-      isPlaying = false;
+            media.removeAttribute('src');
+            fileInput.value = '';
+            waveformPeaks = null;
+            zoomLevel = 1;
+            duration = 0;
+            isPlaying = false;
       playIcon.style.display = 'block';
       pauseIcon.style.display = 'none';
       cancelAnimationFrame(animationFrame);
