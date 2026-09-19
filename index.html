@@ -312,15 +312,15 @@
           font-variant-numeric: tabular-nums;
         }
     /* Hidden media elements used for processing */
-    #sourceMedia {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0.15;
-      z-index: 0;
-      pointer-events: none;
-    }
+        #sourceMedia {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          opacity: 0;
+          visibility: hidden;
+          pointer-events: none;
+          z-index: 0;
+        }
     
     /* Custom Waveform & Trimmer */
     .trimmer-wrapper {
@@ -814,17 +814,10 @@
           document.getElementById('trackTitle').innerText = file.name;
 
           const objectUrl = URL.createObjectURL(file);
-      media.src = objectUrl;
+                media.src = objectUrl;
 
-      // Show video if it is a video file, otherwise just play audio in background
-      if (file.type.startsWith('video/')) {
-        media.style.opacity = '0.3';
-      } else {
-        media.style.opacity = '0';
-      }
-
-      media.onloadedmetadata = () => {
-              duration = media.duration;
+                media.onloadedmetadata = () => {
+                        duration = media.duration;
         
               // Setup Sliders
               sliderStart.max = duration;
