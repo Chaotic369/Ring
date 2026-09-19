@@ -70,19 +70,19 @@
       text-align: center;
     }
     h1 {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #7c3aed, #ec4899);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 4px;
-    }
-    p.subtitle {
-      font-size: 13px;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
+          font-size: 22px;
+          font-weight: 700;
+          letter-spacing: -0.5px;
+          background: linear-gradient(135deg, #7c3aed, #ec4899);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          margin-bottom: 4px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100%;
+          padding: 0 10px;
+        }
 
     /* Screens */
     .screen {
@@ -439,9 +439,8 @@
 
   <main class="app-container">
     <header>
-      <h1>RingCut.</h1>
-      <p class="subtitle">Extract & trim audio from any video or sound file</p>
-    </header>
+          <h1 id="trackTitle">Select Media</h1>
+        </header>
 
     <!-- SCREEN 1: UPLOAD -->
     <section id="uploadScreen" class="screen active">
@@ -549,11 +548,13 @@
         let waveformPeaks = null; // Real decoded audio peaks (null until decoded)
 
     // File Upload Handler
-    fileInput.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+        fileInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
 
-      const objectUrl = URL.createObjectURL(file);
+          document.getElementById('trackTitle').innerText = file.name;
+
+          const objectUrl = URL.createObjectURL(file);
       media.src = objectUrl;
 
       // Show video if it is a video file, otherwise just play audio in background
@@ -888,10 +889,11 @@
     });
 
     // Reset App
-    function resetApp() {
-      media.pause();
-            media.removeAttribute('src');
-            fileInput.value = '';
+        function resetApp() {
+          media.pause();
+                media.removeAttribute('src');
+                fileInput.value = '';
+                document.getElementById('trackTitle').innerText = 'Select Media';
             waveformPeaks = null;
             zoomLevel = 1;
             duration = 0;
