@@ -17,9 +17,49 @@
           --accent-hover: #7c3aed;
           --accent-light: rgba(139, 92, 246, 0.15);
           --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+                  }
 
-    * {
+              :root.dark-mode {
+                --bg-color: #5D4037;
+                --neu-shadow: 9px 9px 16px #412d26, -9px -9px 16px #795348;
+                --neu-inset: inset 6px 6px 10px 0 #412d26, inset -6px -6px 10px 0 #795348;
+                --neu-shadow-sm: 4px 4px 8px #412d26, -4px -4px 8px #795348;
+                --neu-inset-sm: inset 3px 3px 6px 0 #412d26, inset -3px -3px 6px 0 #795348;
+                --text-main: #EFEBE9;
+                --text-muted: #D7CCC8;
+              }
+    
+              :root.dark-mode h1,
+              :root.dark-mode .duration-badge,
+              :root.dark-mode .btn-primary,
+              :root.dark-mode .nudge-label,
+              :root.dark-mode .modal-box h3,
+              :root.dark-mode .btn-cancel,
+              :root.dark-mode .btn-nudge {
+                color: var(--text-main) !important;
+                -webkit-text-fill-color: var(--text-main) !important;
+              }
+    
+              :root.dark-mode .range-track input[type=range]::-webkit-slider-thumb,
+              :root.dark-mode .range-track input[type=range]::-moz-range-thumb {
+                background: var(--text-main) !important;
+                border-color: var(--text-main) !important;
+              }
+    
+              :root.dark-mode .ruler-tick,
+              :root.dark-mode .ruler-subtick {
+                border-color: var(--text-main) !important;
+              }
+    
+              :root.dark-mode .modal-box p {
+                color: rgba(255, 255, 255, 0.7);
+              }
+    
+              :root.dark-mode .gain-slider {
+                accent-color: var(--text-main) !important;
+              }
+
+              * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -585,11 +625,14 @@
   
 
   <main class="app-container">
-    <header>
-          <h1 id="trackTitle">Select Media</h1>
-        </header>
+      <header style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+            <h1 id="trackTitle" style="margin: 0; padding: 0;">Select Media</h1>
+            <button class="btn-icon" id="btnThemeToggle" style="width: 32px; height: 32px; min-width: 32px; box-shadow: var(--neu-shadow-sm);" title="Toggle Dark Mode">
+              <svg width="14" height="14" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+          </header>
 
-    <!-- SCREEN 1: UPLOAD -->
+      <!-- SCREEN 1: UPLOAD -->
     <section id="uploadScreen" class="screen active">
       <input type="file" id="fileInput" accept="video/*, audio/*" style="display: none;">
       <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
