@@ -614,13 +614,17 @@
           transform: scale(0.96);
         }
         .btn-cancel {
-          background: var(--bg-color);
-          color: #000000;
-        }
-        .btn-confirm {
-          background: var(--bg-color);
-          color: #991b1b;
-        }
+                  background: var(--bg-color);
+                  color: #000000;
+                }
+                .btn-confirm {
+                  background: var(--bg-color);
+                  color: #991b1b;
+                }
+                .btn-success {
+                  background: var(--bg-color);
+                  color: var(--accent);
+                }
       </style>
 </head>
 <body>
@@ -714,17 +718,29 @@
           </section>
 
           <!-- Reset Modal -->
-          <div id="resetModal" class="modal-overlay">
-            <div class="modal-box">
-              <h3>Start Over?</h3>
-              <p>All unsaved progress will be lost.</p>
-              <div class="modal-actions">
-                <button class="btn-modal btn-cancel" onclick="closeResetModal()">Cancel</button>
-                <button class="btn-modal btn-confirm" onclick="confirmResetApp()">Start Over</button>
-              </div>
-            </div>
-          </div>
-        </main>
+                    <div id="resetModal" class="modal-overlay">
+                      <div class="modal-box">
+                        <h3>Start Over?</h3>
+                        <p>All unsaved progress will be lost.</p>
+                        <div class="modal-actions">
+                          <button class="btn-modal btn-cancel" onclick="closeResetModal()">Cancel</button>
+                          <button class="btn-modal btn-confirm" onclick="confirmResetApp()">Start Over</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Save Success Modal -->
+                    <div id="saveModal" class="modal-overlay">
+                      <div class="modal-box">
+                        <h3>File Saved!</h3>
+                        <p>Your ringtone has been exported successfully.</p>
+                        <div class="modal-actions">
+                          <button class="btn-modal btn-cancel" onclick="closeSaveModal()">Later</button>
+                          <button class="btn-modal btn-success" onclick="promptSetRingtone()">Set Ringtone</button>
+                        </div>
+                      </div>
+                    </div>
+                  </main>
 
         <script>
     const fileInput = document.getElementById('fileInput');
@@ -1294,32 +1310,36 @@
                     const fileToSave = new File([wavBlob], filename, { type: 'audio/wav' });
         
                     if (navigator.canShare && navigator.canShare({ files: [fileToSave] })) {
-                      try {
-                        await navigator.share({
-                          title: 'Exported Ringtone',
-                          files: [fileToSave]
-                        });
-                      } catch (shareErr) {
-                        console.log("Share cancelled or failed", shareErr);
-                      }
-                    } else {
-                      // Strategy 2: Base64 Data URI Fallback (Bypasses Cordova blob restrictions)
-                      const reader = new FileReader();
-                      reader.readAsDataURL(wavBlob);
-                      reader.onloadend = function() {
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = reader.result;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        setTimeout(() => document.body.removeChild(a), 100);
-                      };
-                    }
+                              try {
+                                await navigator.share({
+                                  title: 'Exported Ringtone',
+                                  files: [fileToSave]
+                                });
+                                showSaveModal();
+                              } catch (shareErr) {
+                                console.log("Share cancelled or failed", shareErr);
+                              }
+                            } else {
+                              // Strategy 2: Base64 Data URI Fallback (Bypasses Cordova blob restrictions)
+                              const reader = new FileReader();
+                              reader.readAsDataURL(wavBlob);
+                              reader.onloadend = function() {
+                                const a = document.createElement('a');
+                                a.style.display = 'none';
+                                a.href = reader.result;
+                                a.download = filename;
+                                document.body.appendChild(a);
+                                a.click();
+                                setTimeout(() => {
+                                  document.body.removeChild(a);
+                                  showSaveModal();
+                                }, 100);
+                              };
+                            }
         
-                    btnExport.innerHTML = btnOrigText;
-                    btnExport.style.pointerEvents = 'auto';
-                  } catch (err) {
+                            btnExport.innerHTML = btnOrigText;
+                            btnExport.style.pointerEvents = 'auto';
+                          } catch (err) {
             console.error(err);
             alert("Error exporting audio: " + err.message);
             btnExport.innerHTML = btnOrigText;
@@ -1369,12 +1389,28 @@
           return new Blob([bufferArr], { type: "audio/wav" });
         }
 
-    // Reset App Modal Logic
-        const resetModal = document.getElementById('resetModal');
+    // Save Success Modal Logic
+        const saveModal = document.getElementById('saveModal');
 
-        function resetApp() {
-          resetModal.classList.add('active');
+        function showSaveModal() {
+          saveModal.classList.add('active');
         }
+
+        function closeSaveModal() {
+          saveModal.classList.remove('active');
+        }
+
+        function promptSetRingtone() {
+          closeSaveModal();
+          alert("To set this as your ringtone:\n\n1. Open your phone's Settings.\n2. Go to Sound & Vibration > Ringtone.\n3. Tap 'Custom' or '+' and select the file you just saved.");
+        }
+
+        // Reset App Modal Logic
+            const resetModal = document.getElementById('resetModal');
+
+            function resetApp() {
+              resetModal.classList.add('active');
+            }
 
         function closeResetModal() {
           resetModal.classList.remove('active');
