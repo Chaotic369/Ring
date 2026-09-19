@@ -178,21 +178,27 @@
               pointer-events: none;
             }
             .ruler-tick {
-                      position: absolute;
-                      top: 0;
-                      height: 8px;
-                      border-left: 0.5px solid #f97316;
-                    }
-            .ruler-label {
-              position: absolute;
-              top: 6px;
-              font-size: 9px;
-              font-weight: 600;
-              color: var(--text-muted);
-              transform: translateX(3px);
-              font-variant-numeric: tabular-nums;
-              white-space: nowrap;
-            }
+                                  position: absolute;
+                                  top: 0;
+                                  height: 8px;
+                                  border-left: 0.5px solid #000000;
+                                }
+                        .ruler-subtick {
+                                  position: absolute;
+                                  top: 0;
+                                  height: 4px;
+                                  border-left: 0.5px solid rgba(0, 0, 0, 0.4);
+                                }
+                        .ruler-label {
+                          position: absolute;
+                          top: 8px;
+                          font-size: 9px;
+                          font-weight: 600;
+                          color: var(--text-muted);
+                          transform: translateX(3px);
+                          font-variant-numeric: tabular-nums;
+                          white-space: nowrap;
+                        }
             .playhead {
                       position: absolute;
                       top: 0;
@@ -473,22 +479,22 @@
         }
 
     /* Reset Button */
-    .btn-text {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: underline;
-      text-decoration-color: transparent;
-      transition: text-decoration-color 0.2s ease;
-      margin-top: -8px;
-    }
-    .btn-text:hover {
-      color: var(--text-main);
-      text-decoration-color: var(--text-main);
-    }
+        .btn-text {
+          background: none;
+          border: none;
+          color: #991b1b;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          text-decoration: underline;
+          text-decoration-color: transparent;
+          transition: text-decoration-color 0.2s ease;
+          margin-top: -8px;
+        }
+        .btn-text:hover {
+          color: #7f1d1d;
+          text-decoration-color: #7f1d1d;
+        }
 
     svg {
       fill: none;
@@ -964,27 +970,40 @@
         }, { passive: false });
 
         // Draws time ticks and labels that adapt to the zoom level
-        function drawRuler() {
-          timeRuler.innerHTML = '';
-          if (!duration) return;
-          const steps = [0.1, 0.25, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300];
-          const pxPerSec = timelineInner.offsetWidth / duration;
-          let step = steps[steps.length - 1];
-          for (const s of steps) {
-            if (s * pxPerSec >= 60) { step = s; break; }
-          }
-          for (let t = 0; t <= duration; t += step) {
-            const tick = document.createElement('div');
-            tick.className = 'ruler-tick';
-            tick.style.left = ((t / duration) * 100) + '%';
-            timeRuler.appendChild(tick);
-            const label = document.createElement('div');
-            label.className = 'ruler-label';
-            label.style.left = ((t / duration) * 100) + '%';
-            label.textContent = step < 1 ? t.toFixed(1) + 's' : formatTime(t);
-            timeRuler.appendChild(label);
-          }
-        }
+                function drawRuler() {
+                  timeRuler.innerHTML = '';
+                  if (!duration) return;
+                  const steps = [0.1, 0.25, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300];
+                  const pxPerSec = timelineInner.offsetWidth / duration;
+                  let step = steps[steps.length - 1];
+                  for (const s of steps) {
+                    if (s * pxPerSec >= 70) { step = s; break; }
+                  }
+          
+                  const numSubdivisions = 5;
+                  const subStep = step / numSubdivisions;
+                  const totalTicks = Math.ceil(duration / subStep);
+
+                  for (let i = 0; i <= totalTicks; i++) {
+                    const t = i * subStep;
+                    if (t > duration) break;
+            
+                    const isMain = (i % numSubdivisions === 0);
+            
+                    const tick = document.createElement('div');
+                    tick.className = isMain ? 'ruler-tick' : 'ruler-subtick';
+                    tick.style.left = ((t / duration) * 100) + '%';
+                    timeRuler.appendChild(tick);
+            
+                    if (isMain) {
+                      const label = document.createElement('div');
+                      label.className = 'ruler-label';
+                      label.style.left = ((t / duration) * 100) + '%';
+                      label.textContent = step < 1 ? t.toFixed(1) + 's' : formatTime(t);
+                      timeRuler.appendChild(label);
+                    }
+                  }
+                }
 
         // Decodes the real audio so the graph shows the true waveform (falls back to procedural on failure)
             function decodeRealWaveform(file) {
