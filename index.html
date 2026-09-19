@@ -342,25 +342,68 @@
                 box-shadow: 2px 2px 6px rgba(163,177,198,0.6), -2px -2px 6px rgba(255,255,255,0.6);
               }
 
-              /* Time Info */
-        .time-info {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 12px;
-          font-weight: 600;
-          color: var(--text-muted);
-          font-variant-numeric: tabular-nums;
-        }
-        .duration-badge {
-              background: var(--bg-color);
-              padding: 6px 14px;
-              border-radius: 999px;
-              color: #000000;
-              box-shadow: var(--neu-shadow-sm);
-            }
+              /* Time Info & Nudge Controls */
+                      .time-info {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: var(--text-muted);
+                        font-variant-numeric: tabular-nums;
+                        gap: 6px;
+                      }
+                      .time-col {
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                      }
+                      .btn-nudge {
+                        width: 24px;
+                        height: 24px;
+                        border-radius: 50%;
+                        border: none;
+                        background: var(--bg-color);
+                        box-shadow: var(--neu-shadow-sm);
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: #000;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                      }
+                      .btn-nudge:active {
+                        box-shadow: var(--neu-inset-sm);
+                      }
+                      .duration-badge {
+                            background: var(--bg-color);
+                            padding: 6px 14px;
+                            border-radius: 999px;
+                            color: #000000;
+                            box-shadow: var(--neu-shadow-sm);
+                          }
+                      .btn-toggle.active {
+                        box-shadow: var(--neu-inset-sm) !important;
+                        color: var(--accent);
+                      }
+                      .gain-panel {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                        font-size: 11px;
+                        font-weight: 600;
+                      }
+                      .gain-slider {
+                        position: relative !important;
+                        width: 120px !important;
+                        height: 6px !important;
+                        pointer-events: auto !important;
+                        accent-color: #000;
+                      }
 
-    /* Playback Controls */
+                  /* Playback Controls */
         .controls {
           display: flex;
           align-items: center;
@@ -496,20 +539,37 @@
             </div>
 
       <div class="time-info">
-        <span id="timeStart">00:00</span>
-        <span class="duration-badge" id="timeDuration">30.0s Ringtone</span>
-        <span id="timeEnd">00:30</span>
-      </div>
+              <div class="time-col">
+                <button class="btn-nudge" id="btnNudgeStartDown" title="-0.1s">−</button>
+                <span id="timeStart">00:00</span>
+                <button class="btn-nudge" id="btnNudgeStartUp" title="+0.1s">+</button>
+              </div>
+              <span class="duration-badge" id="timeDuration">30.0s Ringtone</span>
+              <div class="time-col">
+                <button class="btn-nudge" id="btnNudgeEndDown" title="-0.1s">−</button>
+                <span id="timeEnd">00:30</span>
+                <button class="btn-nudge" id="btnNudgeEndUp" title="+0.1s">+</button>
+              </div>
+            </div>
 
-      <div class="controls">
-        <button class="btn-icon" id="btnRewind" title="Back to Start">
-          <svg width="20" height="20" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
-        </button>
-        <button class="btn-icon play-btn" id="btnPlayPause">
-          <svg id="playIcon" width="24" height="24" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon></svg>
-          <svg id="pauseIcon" width="24" height="24" viewBox="0 0 24 24" style="display:none;"><rect x="6" y="4" width="4" height="16" fill="currentColor"></rect><rect x="14" y="4" width="4" height="16" fill="currentColor"></rect></svg>
-        </button>
-      </div>
+            <div class="gain-panel">
+              <span>Vol</span>
+              <input type="range" class="gain-slider" id="gainSlider" min="0.5" max="2" step="0.1" value="1">
+              <span id="gainValue">100%</span>
+            </div>
+
+            <div class="controls">
+              <button class="btn-icon" id="btnRewind" title="Back to Start">
+                <svg width="20" height="20" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
+              </button>
+              <button class="btn-icon play-btn" id="btnPlayPause">
+                <svg id="playIcon" width="24" height="24" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon></svg>
+                <svg id="pauseIcon" width="24" height="24" viewBox="0 0 24 24" style="display:none;"><rect x="6" y="4" width="4" height="16" fill="currentColor"></rect><rect x="14" y="4" width="4" height="16" fill="currentColor"></rect></svg>
+              </button>
+              <button class="btn-icon btn-toggle active" id="btnLoop" title="Toggle Loop">
+                <svg width="20" height="20" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+              </button>
+            </div>
 
       <button class="btn-primary" id="btnExport">
         <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -669,21 +729,28 @@
     }
 
     function trackPlayback() {
-          if (!isPlaying) return;
+              if (!isPlaying) return;
       
-          const endVal = parseFloat(sliderEnd.value);
-          const startVal = parseFloat(sliderStart.value);
+              const endVal = parseFloat(sliderEnd.value);
+              const startVal = parseFloat(sliderStart.value);
       
-          // Loop back to start when reaching the end of selection
-          if (media.currentTime >= endVal) {
-            media.currentTime = startVal;
-          }
+              // Check playback bounds based on loop toggle
+              if (media.currentTime >= endVal) {
+                if (isLooping) {
+                  media.currentTime = startVal;
+                } else {
+                  togglePlay();
+                  media.currentTime = startVal;
+                  updatePlayhead();
+                  return;
+                }
+              }
 
-          updatePlayhead();
-          followPlayhead();
+              updatePlayhead();
+              followPlayhead();
       
-          animationFrame = requestAnimationFrame(trackPlayback);
-        }
+              animationFrame = requestAnimationFrame(trackPlayback);
+            }
 
         // Moves the red playback line to the current time
                 function updatePlayhead() {
@@ -729,20 +796,76 @@
                 });
 
                 const stopPlayheadDrag = (e) => {
-                  if (!isDraggingPlayhead) return;
-                  isDraggingPlayhead = false;
-                  try {
-                    playhead.releasePointerCapture(e.pointerId);
-                  } catch (err) {}
-                  if (wasPlayingBeforeDrag) {
-                    togglePlay();
-                  }
-                };
+                          if (!isDraggingPlayhead) return;
+                          isDraggingPlayhead = false;
+                          try {
+                            playhead.releasePointerCapture(e.pointerId);
+                          } catch (err) {}
+                          if (wasPlayingBeforeDrag) {
+                            togglePlay();
+                          }
+                        };
 
-                playhead.addEventListener('pointerup', stopPlayheadDrag);
-                playhead.addEventListener('pointercancel', stopPlayheadDrag);
+                        playhead.addEventListener('pointerup', stopPlayheadDrag);
+                        playhead.addEventListener('pointercancel', stopPlayheadDrag);
 
-        // Keeps the playhead visible by auto-scrolling the timeline while playing
+                        // Feature 3: Click-to-Seek on Timeline
+                        timelineInner.addEventListener('click', (e) => {
+                          if (!duration || isDraggingPlayhead || e.target.closest('input[type=range]')) return;
+                          setPlayheadFromPointer(e.clientX);
+                        });
+
+                        // Feature 4: Volume / Gain Normalization
+                        const gainSlider = document.getElementById('gainSlider');
+                        const gainValue = document.getElementById('gainValue');
+                        let audioCtxVolume = null;
+                        let gainNode = null;
+
+                        gainSlider.addEventListener('input', (e) => {
+                          const val = parseFloat(e.target.value);
+                          gainValue.innerText = Math.round(val * 100) + '%';
+                          if (val <= 1) {
+                            media.volume = val;
+                            if (gainNode) gainNode.gain.value = 1;
+                          } else {
+                            media.volume = 1;
+                            if (!audioCtxVolume) {
+                              try {
+                                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                                audioCtxVolume = new AudioContextClass();
+                                const source = audioCtxVolume.createMediaElementSource(media);
+                                gainNode = audioCtxVolume.createGain();
+                                source.connect(gainNode);
+                                gainNode.connect(audioCtxVolume.destination);
+                              } catch (err) {}
+                            }
+                            if (gainNode) gainNode.gain.value = val;
+                          }
+                        });
+
+                        // Feature 5: Nudge Buttons (Fine Tuning +/-0.1s)
+                        function nudge(slider, delta) {
+                          if (!duration) return;
+                          const current = parseFloat(slider.value);
+                          const next = Math.max(0, Math.min(duration, current + delta));
+                          slider.value = next;
+                          updateUI.call(slider);
+                        }
+
+                        document.getElementById('btnNudgeStartDown').addEventListener('click', () => nudge(sliderStart, -0.1));
+                        document.getElementById('btnNudgeStartUp').addEventListener('click', () => nudge(sliderStart, 0.1));
+                        document.getElementById('btnNudgeEndDown').addEventListener('click', () => nudge(sliderEnd, -0.1));
+                        document.getElementById('btnNudgeEndUp').addEventListener('click', () => nudge(sliderEnd, 0.1));
+
+                        // Feature 6: Loop Selection Toggle
+                        let isLooping = true;
+                        const btnLoop = document.getElementById('btnLoop');
+                        btnLoop.addEventListener('click', () => {
+                          isLooping = !isLooping;
+                          btnLoop.classList.toggle('active', isLooping);
+                        });
+
+                        // Keeps the playhead visible by auto-scrolling the timeline while playing
         function followPlayhead() {
           const inner = timelineInner.offsetWidth;
           const view = timelineScroll.clientWidth;
