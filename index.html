@@ -840,38 +840,39 @@
         }
 
         // Decodes the real audio so the graph shows the true waveform (falls back to procedural on failure)
-        function decodeRealWaveform(file) {
-          try {
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (!AudioCtx) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-              const audioCtx = new AudioCtx();
-              audioCtx.decodeAudioData(reader.result).then((buffer) => {
-                const data = buffer.getChannelData(0);
-                const bucketCount = 4000;
-                const block = Math.max(1, Math.floor(data.length / bucketCount));
-                const peaks = new Float32Array(bucketCount);
-                for (let i = 0; i < bucketCount; i++) {
-                  let max = 0;
-                  const startIdx = i * block;
-                  for (let j = 0; j < block; j += 8) {
-                    const v = Math.abs(data[startIdx + j] || 0);
-                    if (v > max) max = v;
-                  }
-                  peaks[i] = max;
-                }
-                waveformPeaks = peaks;
-                drawProceduralWaveform();
-                audioCtx.close().catch(() => {});
-              }).catch(() => {
-                audioCtx.close().catch(() => {});
-              });
-            };
-            reader.onerror = () => {};
-            reader.readAsArrayBuffer(file);
-          } catch (err) {}
-        }
+            function decodeRealWaveform(file) {
+              try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                  const audioCtx = new AudioCtx();
+                  audioCtx.decodeAudioData(reader.result).then((buffer) => {
+                    const data = buffer.getChannelData(0);
+                    const bucketCount = 12000;
+                    const block = Math.max(1, Math.floor(data.length / bucketCount));
+                    const peaks = new Float32Array(bucketCount);
+                    for (let i = 0; i < bucketCount; i++) {
+                      let max = 0;
+                      const startIdx = i * block;
+                      const endIdx = Math.min(data.length, startIdx + block);
+                      for (let j = startIdx; j < endIdx; j += 4) {
+                        const v = Math.abs(data[j]);
+                        if (v > max) max = v;
+                      }
+                      peaks[i] = max;
+                    }
+                    waveformPeaks = peaks;
+                    drawProceduralWaveform();
+                    audioCtx.close().catch(() => {});
+                  }).catch(() => {
+                    audioCtx.close().catch(() => {});
+                  });
+                };
+                reader.onerror = () => {};
+                reader.readAsArrayBuffer(file);
+              } catch (err) {}
+            }
 
         // Keep the playhead in sync when scrubbing or while paused
         media.addEventListener('timeupdate', updatePlayhead);
@@ -903,23 +904,65 @@
               const midY = height / 2;
       
               ctx.clearRect(0, 0, width, height);
+
+              // Subtle horizontal grid reference lines
+              ctx.lineWidth = 1;
+              ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
+              [0.2, 0.35, 0.5, 0.65, 0.8].forEach(ratio => {
+                const gy = height * ratio;
+                ctx.beginPath();
+                ctx.moveTo(0, gy);
+                ctx.lineTo(width, gy);
+                ctx.stroke();
+              });
       
-              const barWidth = 2;
-              const barGap = 2;
+              const barWidth = 1.5;
+              const barGap = 1.5;
               const bars = Math.floor(width / (barWidth + barGap));
       
-          ctx.fillStyle = waveformPeaks ? 'rgba(139, 92, 246, 0.75)' : 'rgba(255, 255, 255, 0.4)';
-      
-          for (let i = 0; i < bars; i++) {
-            let barHeight;
-            if (waveformPeaks) {
-              // Real audio: take the loudest peak inside this bar's slice of the timeline
-              const from = Math.floor((i / bars) * waveformPeaks.length);
-              const to = Math.max(from + 1, Math.floor(((i + 1) / bars) * waveformPeaks.length));
-              let peak = 0;
-              for (let k = from; k < to && k < waveformPeaks.length; k++) {
-                if (waveformPeaks[k] > peak) peak = waveformPeaks[k];
+              for (let i = 0; i < bars; i++) {
+                let primaryPeak = 0;
+                let secondaryPeak = 0;
+
+                if (waveformPeaks) {
+                  const from = Math.floor((i / bars) * waveformPeaks.length);
+                  const to = Math.max(from + 1, Math.floor(((i + 1) / bars) * waveformPeaks.length));
+                  let sum = 0;
+                  for (let k = from; k < to && k < waveformPeaks.length; k++) {
+                    const val = waveformPeaks[k];
+                    if (val > primaryPeak) primaryPeak = val;
+                    sum += val;
+                  }
+                  secondaryPeak = sum / (to - from);
+                } else {
+                  const harmonic1 = Math.sin(i * 0.08) * 0.35;
+                  const harmonic2 = Math.sin(i * 0.33) * 0.25;
+                  const harmonic3 = Math.cos(i * 0.85) * 0.15;
+                  const microJitter = (Math.sin(i * 3.14) * 0.5 + 0.5) * 0.15;
+                  primaryPeak = Math.abs(harmonic1 + harmonic2 + harmonic3) + microJitter + 0.06;
+                  secondaryPeak = primaryPeak * 0.55;
+                }
+
+                const totalH = Math.max(3, Math.min(1, primaryPeak * 1.6) * height * 0.86);
+                const coreH = Math.max(2, Math.min(1, secondaryPeak * 1.6) * height * 0.86);
+                const x = i * (barWidth + barGap);
+
+                // Layer 1: Outer detailed frequency envelope
+                ctx.fillStyle = waveformPeaks ? 'rgba(30, 41, 59, 0.35)' : 'rgba(30, 41, 59, 0.2)';
+                ctx.fillRect(x, midY - totalH / 2, barWidth, totalH);
+
+                // Layer 2: Core density spike
+                ctx.fillStyle = waveformPeaks ? 'rgba(15, 23, 42, 0.85)' : 'rgba(15, 23, 42, 0.6)';
+                ctx.fillRect(x, midY - coreH / 2, barWidth, coreH);
               }
+
+              // Center baseline reference
+              ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+              ctx.beginPath();
+              ctx.moveTo(0, midY);
+              ctx.lineTo(width, midY);
+              ctx.stroke();
+            }
               barHeight = Math.max(4, Math.min(1, peak * 1.6) * height * 0.85);
             } else {
               // Placeholder look until the real audio has finished decoding
