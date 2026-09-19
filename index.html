@@ -48,7 +48,7 @@
                   :root.dark-mode .range-track input[type=range]::-moz-range-thumb {
                     background: var(--text-main) !important;
                     border-color: var(--text-main) !important;
-                    box-shadow: 0 0 12px rgba(0, 0, 0, 0.8) !important;
+                    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.7) !important;
                   }
     
               :root.dark-mode .ruler-tick,
@@ -372,27 +372,27 @@
           margin: 0;
         }
         .range-track input[type=range]::-webkit-slider-thumb {
-              -webkit-appearance: none;
-              pointer-events: auto;
-              width: 8px;
-                    height: 160px; /* Tall handle for easy grabbing */
-                    background: #000000;
-                    border: 1px solid #000000;
-                    border-radius: 4px;
-                    cursor: ew-resize;
-                    box-shadow: 2px 2px 6px rgba(163,177,198,0.6), -2px -2px 6px rgba(255,255,255,0.6);
-                    margin-top: 0;
-                  }
-            .range-track input[type=range]::-moz-range-thumb {
-              pointer-events: auto;
-              width: 8px;
-                    height: 160px;
-                    background: #000000;
-                    border: 1px solid #000000;
-                    border-radius: 4px;
-                    cursor: ew-resize;
-                    box-shadow: 2px 2px 6px rgba(163,177,198,0.6), -2px -2px 6px rgba(255,255,255,0.6);
-                  }
+                  -webkit-appearance: none;
+                  pointer-events: auto;
+                  width: 8px;
+                        height: 160px; /* Tall handle for easy grabbing */
+                        background: #000000;
+                        border: 1px solid #000000;
+                        border-radius: 4px;
+                        cursor: ew-resize;
+                        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+                        margin-top: 0;
+                      }
+                .range-track input[type=range]::-moz-range-thumb {
+                  pointer-events: auto;
+                  width: 8px;
+                        height: 160px;
+                        background: #000000;
+                        border: 1px solid #000000;
+                        border-radius: 4px;
+                        cursor: ew-resize;
+                        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+                      }
 
               /* Time Info & Nudge Controls */
                       .time-info {
