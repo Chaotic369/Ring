@@ -11,8 +11,8 @@
           --neu-inset: inset 6px 6px 10px 0 rgba(163,177,198, 0.7), inset -6px -6px 10px 0 rgba(255,255,255, 0.8);
           --neu-shadow-sm: 4px 4px 8px rgb(163,177,198,0.5), -4px -4px 8px rgba(255,255,255, 0.5);
           --neu-inset-sm: inset 3px 3px 6px 0 rgba(163,177,198, 0.6), inset -3px -3px 6px 0 rgba(255,255,255, 0.7);
-          --text-main: #4a5568;
-          --text-muted: #718096;
+          --text-main: #000000;
+          --text-muted: #000000;
           --accent: #8b5cf6;
           --accent-hover: #7c3aed;
           --accent-light: rgba(139, 92, 246, 0.15);
@@ -70,12 +70,11 @@
       text-align: center;
     }
     h1 {
-          font-size: 22px;
-          font-weight: 700;
-          letter-spacing: -0.5px;
-          background: linear-gradient(135deg, #7c3aed, #ec4899);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          font-size: 15px;
+          font-weight: 600;
+          letter-spacing: -0.2px;
+          color: #000000;
+          -webkit-text-fill-color: #000000;
           margin-bottom: 4px;
           white-space: nowrap;
           overflow: hidden;
@@ -179,11 +178,11 @@
               pointer-events: none;
             }
             .ruler-tick {
-              position: absolute;
-              top: 0;
-              height: 8px;
-              border-left: 1px solid rgba(100, 116, 139, 0.45);
-            }
+                      position: absolute;
+                      top: 0;
+                      height: 8px;
+                      border-left: 0.5px solid #f97316;
+                    }
             .ruler-label {
               position: absolute;
               top: 6px;
@@ -195,16 +194,16 @@
               white-space: nowrap;
             }
             .playhead {
-              position: absolute;
-              top: 0;
-              bottom: 0;
-              width: 2px;
-              background: #ef4444;
-              box-shadow: 0 0 6px rgba(239, 68, 68, 0.7);
-              pointer-events: none;
-              z-index: 5;
-              left: 0;
-            }
+                      position: absolute;
+                      top: 0;
+                      bottom: 0;
+                      width: 1px;
+                      background: #f97316;
+                      box-shadow: 0 0 4px rgba(249, 115, 22, 0.6);
+                      pointer-events: none;
+                      z-index: 5;
+                      left: 0;
+                    }
             .playhead::before {
               content: '';
               position: absolute;
@@ -277,14 +276,14 @@
       border-radius: 8px;
     }
     .selection-overlay {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      background: var(--accent-light);
-      border-left: 2px solid var(--accent);
-      border-right: 2px solid var(--accent);
-      pointer-events: none;
-    }
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          background: var(--accent-light);
+          border-left: 1px solid #f97316;
+          border-right: 1px solid #f97316;
+          pointer-events: none;
+        }
 
     /* Dual Range Sliders styling */
     .range-track {
@@ -342,12 +341,12 @@
           font-variant-numeric: tabular-nums;
         }
         .duration-badge {
-          background: var(--bg-color);
-          padding: 6px 14px;
-          border-radius: 999px;
-          color: var(--accent);
-          box-shadow: var(--neu-shadow-sm);
-        }
+              background: var(--bg-color);
+              padding: 6px 14px;
+              border-radius: 999px;
+              color: #000000;
+              box-shadow: var(--neu-shadow-sm);
+            }
 
     /* Playback Controls */
         .controls {
@@ -384,23 +383,23 @@
         }
 
         /* Export Button */
-        .btn-primary {
-          width: 100%;
-          padding: 16px;
-          border-radius: 16px;
-          background: var(--bg-color);
-          border: none;
-          color: var(--accent);
-          font-size: 14px;
-          font-weight: 700;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          transition: all 0.2s ease;
-          box-shadow: var(--neu-shadow);
-        }
+            .btn-primary {
+              width: 100%;
+              padding: 16px;
+              border-radius: 16px;
+              background: var(--bg-color);
+              border: none;
+              color: #000000;
+              font-size: 14px;
+              font-weight: 700;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 8px;
+              transition: all 0.2s ease;
+              box-shadow: var(--neu-shadow);
+            }
         .btn-primary:active {
           box-shadow: var(--neu-inset);
           transform: translateY(2px);
