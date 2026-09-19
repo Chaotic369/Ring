@@ -1310,39 +1310,47 @@
                     const wavBlob = audioBufferToWav(renderedBuffer);
                     const filename = `ringtone_${currentFile.name.replace(/\.[^/.]+$/, "")}.wav`;
         
-                    // Strategy 1: Native Android Share Sheet (Best for Cordova/WebViews)
                     const fileToSave = new File([wavBlob], filename, { type: 'audio/wav' });
+
+                                        // Strategy 1: Real file write through the native bridge (Cordova file plugin or Android JS interface)
+                                        const savedPath = await saveWavNatively(wavBlob, filename);
+
+                                        if (savedPath) {
+                                          showSaveModal(savedPath, 'native');
+                                        } else if (navigator.canShare && navigator.canShare({ files: [fileToSave] })) {
+                                          // Strategy 2: Native share sheet (lets the user pick "Save to device" or a file manager)
+                                          try {
+                                            await navigator.share({
+                                              title: 'Exported Ringtone',
+                                              files: [fileToSave]
+                                            });
+                                            showSaveModal(filename, 'share');
+                                          } catch (shareErr) {
+                                            console.log("Share cancelled or failed", shareErr);
+                                          }
+                                        } else {
+                                          // Strategy 3: Browser download (works in a normal browser, not in most APK WebViews)
+                                          const isNativeWebView = !!(window.cordova || window.Android || /; wv\)/i.test(navigator.userAgent));
+                                          const blobUrl = URL.createObjectURL(wavBlob);
+                                          const a = document.createElement('a');
+                                          a.style.display = 'none';
+                                          a.href = blobUrl;
+                                          a.download = filename;
+                                          document.body.appendChild(a);
+                                          a.click();
+                                          setTimeout(() => {
+                                            document.body.removeChild(a);
+                                            URL.revokeObjectURL(blobUrl);
+                                            if (isNativeWebView) {
+                                              showSaveModal(filename, 'failed');
+                                            } else {
+                                              showSaveModal(filename, 'download');
+                                            }
+                                          }, 300);
+                                        }
         
-                    if (navigator.canShare && navigator.canShare({ files: [fileToSave] })) {
-                              try {
-                                await navigator.share({
-                                  title: 'Exported Ringtone',
-                                  files: [fileToSave]
-                                });
-                                showSaveModal(filename, 'share');
-                              } catch (shareErr) {
-                                console.log("Share cancelled or failed", shareErr);
-                              }
-                            } else {
-                              // Strategy 2: Base64 Data URI Fallback (Bypasses Cordova blob restrictions)
-                              const reader = new FileReader();
-                              reader.readAsDataURL(wavBlob);
-                              reader.onloadend = function() {
-                                const a = document.createElement('a');
-                                a.style.display = 'none';
-                                a.href = reader.result;
-                                a.download = filename;
-                                document.body.appendChild(a);
-                                a.click();
-                                setTimeout(() => {
-                                  document.body.removeChild(a);
-                                  showSaveModal(filename, 'download');
-                                }, 100);
-                              };
-                            }
-        
-                            btnExport.innerHTML = btnOrigText;
-                            btnExport.style.pointerEvents = 'auto';
+                                                btnExport.innerHTML = btnOrigText;
+                                                btnExport.style.pointerEvents = 'auto';
                           } catch (err) {
             console.error(err);
             alert("Error exporting audio: " + err.message);
@@ -1351,7 +1359,71 @@
           }
         });
 
-        function audioBufferToWav(buffer) {
+        // Converts a Blob to a base64 string (no data: prefix) for native bridges
+                function blobToBase64(blob) {
+                  return new Promise((resolve, reject) => {
+                    const fr = new FileReader();
+                    fr.onloadend = () => {
+                      const res = String(fr.result || '');
+                      resolve(res.substring(res.indexOf(',') + 1));
+                    };
+                    fr.onerror = () => reject(fr.error);
+                    fr.readAsDataURL(blob);
+                  });
+                }
+
+                // Writes a directory entry + file using the Cordova file plugin; resolves with the saved path or null
+                function writeWithCordovaFile(blob, filename, dirUrl) {
+                  return new Promise((resolve) => {
+                    try {
+                      window.resolveLocalFileSystemURL(dirUrl, (dirEntry) => {
+                        dirEntry.getFile(filename, { create: true, exclusive: false }, (fileEntry) => {
+                          fileEntry.createWriter((writer) => {
+                            writer.onwriteend = () => resolve(fileEntry.nativeURL || fileEntry.fullPath || filename);
+                            writer.onerror = () => resolve(null);
+                            writer.write(blob);
+                          }, () => resolve(null));
+                        }, () => resolve(null));
+                      }, () => resolve(null));
+                    } catch (err) {
+                      resolve(null);
+                    }
+                  });
+                }
+
+                // Tries every native save route in order; returns the saved path/label or null if none worked
+                async function saveWavNatively(blob, filename) {
+                  // Route A: Android JavaScript interface exposed by the APK (window.Android.saveFile(base64, filename))
+                  try {
+                    if (window.Android && typeof window.Android.saveFile === 'function') {
+                      const b64 = await blobToBase64(blob);
+                      const result = window.Android.saveFile(b64, filename);
+                      if (result !== false && result !== 'false' && result !== 'error') {
+                        return (typeof result === 'string' && result.length > 0 && result !== 'true') ? result : ('Downloads/' + filename);
+                      }
+                    }
+                  } catch (err) {
+                    console.log('Android bridge save failed', err);
+                  }
+
+                  // Route B: Cordova file plugin, trying public folders first, then app storage
+                  try {
+                    if (window.cordova && window.resolveLocalFileSystemURL && window.cordova.file) {
+                      const cf = window.cordova.file;
+                      const targets = [cf.externalRootDirectory ? cf.externalRootDirectory + 'Download/' : null, cf.externalDataDirectory, cf.dataDirectory].filter(Boolean);
+                      for (const dir of targets) {
+                        const path = await writeWithCordovaFile(blob, filename, dir);
+                        if (path) return path;
+                      }
+                    }
+                  } catch (err) {
+                    console.log('Cordova file save failed', err);
+                  }
+
+                  return null;
+                }
+
+                function audioBufferToWav(buffer) {
           const numOfChan = buffer.numberOfChannels;
           const length = buffer.length * numOfChan * 2 + 44;
           const bufferArr = new ArrayBuffer(length);
@@ -1397,14 +1469,18 @@
         const saveModal = document.getElementById('saveModal');
 
         function showSaveModal(filename, method) {
-          const pathText = document.getElementById('savePathText');
-          if (method === 'share') {
-            pathText.innerHTML = `Saved via Share Menu as:<br><br><b>${filename}</b>`;
-          } else {
-            pathText.innerHTML = `Saved to Downloads folder as:<br><br><b>${filename}</b>`;
-          }
-          saveModal.classList.add('active');
-        }
+                  const pathText = document.getElementById('savePathText');
+                  if (method === 'share') {
+                    pathText.innerHTML = `Saved via Share Menu as:<br><br><b>${filename}</b>`;
+                  } else if (method === 'native') {
+                    pathText.innerHTML = `Saved to your device:<br><br><b>${filename}</b>`;
+                  } else if (method === 'failed') {
+                    pathText.innerHTML = `Could not save the file. This app build has no file-saving access.<br><br>Add the Cordova file plugin or a native save bridge, then export again.<br><br><b>${filename}</b>`;
+                  } else {
+                    pathText.innerHTML = `Saved to Downloads folder as:<br><br><b>${filename}</b>`;
+                  }
+                  saveModal.classList.add('active');
+                }
 
         function closeSaveModal() {
           saveModal.classList.remove('active');
