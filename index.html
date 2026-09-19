@@ -1143,10 +1143,12 @@
     });
 
     // Reset App
-        function resetApp() {
-          media.pause();
-                media.removeAttribute('src');
-                fileInput.value = '';
+            function resetApp() {
+              if (!confirm("Are you sure you want to start over? All unsaved progress will be lost.")) return;
+          
+              media.pause();
+                    media.removeAttribute('src');
+                    fileInput.value = '';
                 document.getElementById('trackTitle').innerText = 'Select Media';
             waveformPeaks = null;
             zoomLevel = 1;
