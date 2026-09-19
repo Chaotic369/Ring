@@ -298,49 +298,49 @@
         }
 
     /* Dual Range Sliders styling */
-    .range-track {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-    input[type=range] {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      background: transparent;
-      pointer-events: none;
-      outline: none;
-      margin: 0;
-    }
-    input[type=range]::-webkit-slider-thumb {
+        .range-track {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+        }
+        .range-track input[type=range] {
           -webkit-appearance: none;
-          pointer-events: auto;
-          width: 8px;
-                height: 160px; /* Tall handle for easy grabbing */
-                background: #000000;
-                border: 1px solid #000000;
-                border-radius: 4px;
-                cursor: ew-resize;
-                box-shadow: 2px 2px 6px rgba(163,177,198,0.6), -2px -2px 6px rgba(255,255,255,0.6);
-                margin-top: 0;
-              }
-        input[type=range]::-moz-range-thumb {
-          pointer-events: auto;
-          width: 8px;
-                height: 160px;
-                background: #000000;
-                border: 1px solid #000000;
-                border-radius: 4px;
-                cursor: ew-resize;
-                box-shadow: 2px 2px 6px rgba(163,177,198,0.6), -2px -2px 6px rgba(255,255,255,0.6);
-              }
+          appearance: none;
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+          background: transparent;
+          pointer-events: none;
+          outline: none;
+          margin: 0;
+        }
+        .range-track input[type=range]::-webkit-slider-thumb {
+              -webkit-appearance: none;
+              pointer-events: auto;
+              width: 8px;
+                    height: 160px; /* Tall handle for easy grabbing */
+                    background: #000000;
+                    border: 1px solid #000000;
+                    border-radius: 4px;
+                    cursor: ew-resize;
+                    box-shadow: 2px 2px 6px rgba(163,177,198,0.6), -2px -2px 6px rgba(255,255,255,0.6);
+                    margin-top: 0;
+                  }
+            .range-track input[type=range]::-moz-range-thumb {
+              pointer-events: auto;
+              width: 8px;
+                    height: 160px;
+                    background: #000000;
+                    border: 1px solid #000000;
+                    border-radius: 4px;
+                    cursor: ew-resize;
+                    box-shadow: 2px 2px 6px rgba(163,177,198,0.6), -2px -2px 6px rgba(255,255,255,0.6);
+                  }
 
               /* Time Info & Nudge Controls */
                       .time-info {
@@ -354,13 +354,25 @@
                         gap: 6px;
                       }
                       .time-col {
-                        display: flex;
-                        align-items: center;
-                        gap: 4px;
-                      }
-                      .btn-nudge {
-                        width: 24px;
-                        height: 24px;
+                                              display: flex;
+                                              align-items: center;
+                                              gap: 4px;
+                                            }
+                                            .nudge-wrapper {
+                                              display: flex;
+                                              flex-direction: column;
+                                              align-items: center;
+                                              gap: 2px;
+                                            }
+                                            .nudge-label {
+                                              font-size: 8px;
+                                              font-weight: 600;
+                                              color: #000000;
+                                              line-height: 1;
+                                            }
+                                            .btn-nudge {
+                                              width: 24px;
+                                              height: 24px;
                         border-radius: 50%;
                         border: none;
                         background: var(--bg-color);
@@ -540,16 +552,28 @@
 
       <div class="time-info">
               <div class="time-col">
-                <button class="btn-nudge" id="btnNudgeStartDown" title="-0.1s">−</button>
-                <span id="timeStart">00:00</span>
-                <button class="btn-nudge" id="btnNudgeStartUp" title="+0.1s">+</button>
-              </div>
-              <span class="duration-badge" id="timeDuration">30.0s Ringtone</span>
-              <div class="time-col">
-                <button class="btn-nudge" id="btnNudgeEndDown" title="-0.1s">−</button>
-                <span id="timeEnd">00:30</span>
-                <button class="btn-nudge" id="btnNudgeEndUp" title="+0.1s">+</button>
-              </div>
+                              <div class="nudge-wrapper">
+                                <button class="btn-nudge" id="btnNudgeStartDown" title="-0.1s">−</button>
+                                <span class="nudge-label">0.1s</span>
+                              </div>
+                              <span id="timeStart">00:00</span>
+                              <div class="nudge-wrapper">
+                                <button class="btn-nudge" id="btnNudgeStartUp" title="+0.1s">+</button>
+                                <span class="nudge-label">0.1s</span>
+                              </div>
+                            </div>
+                            <span class="duration-badge" id="timeDuration">30.0s Ringtone</span>
+                            <div class="time-col">
+                              <div class="nudge-wrapper">
+                                <button class="btn-nudge" id="btnNudgeEndDown" title="-0.1s">−</button>
+                                <span class="nudge-label">0.1s</span>
+                              </div>
+                              <span id="timeEnd">00:30</span>
+                              <div class="nudge-wrapper">
+                                <button class="btn-nudge" id="btnNudgeEndUp" title="+0.1s">+</button>
+                                <span class="nudge-label">0.1s</span>
+                              </div>
+                            </div>
             </div>
 
             <div class="gain-panel">
