@@ -200,20 +200,32 @@
                       width: 1px;
                       background: #f97316;
                       box-shadow: 0 0 4px rgba(249, 115, 22, 0.6);
-                      pointer-events: none;
-                      z-index: 5;
+                      pointer-events: auto;
+                      cursor: ew-resize;
+                      touch-action: none;
+                      z-index: 10;
                       left: 0;
                     }
-            .playhead::before {
-              content: '';
-              position: absolute;
-              top: 0;
-              left: -4px;
-              width: 10px;
-              height: 10px;
-              background: #ef4444;
-              border-radius: 50%;
-            }
+                    .playhead::before {
+                      content: '';
+                      position: absolute;
+                      top: 0;
+                      left: -10px;
+                      width: 20px;
+                      height: 100%;
+                      background: transparent;
+                    }
+                    .playhead::after {
+                      content: '';
+                      position: absolute;
+                      top: 0;
+                      left: -5px;
+                      width: 11px;
+                      height: 11px;
+                      background: #f97316;
+                      border-radius: 50%;
+                      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+                    }
             .zoom-controls {
               display: flex;
               align-items: center;
@@ -312,8 +324,8 @@
           pointer-events: auto;
           width: 8px;
                 height: 160px; /* Tall handle for easy grabbing */
-                background: #f97316;
-                border: 1px solid #ea580c;
+                background: #000000;
+                border: 1px solid #000000;
                 border-radius: 4px;
                 cursor: ew-resize;
                 box-shadow: 2px 2px 6px rgba(163,177,198,0.6), -2px -2px 6px rgba(255,255,255,0.6);
@@ -323,8 +335,8 @@
           pointer-events: auto;
           width: 8px;
                 height: 160px;
-                background: #f97316;
-                border: 1px solid #ea580c;
+                background: #000000;
+                border: 1px solid #000000;
                 border-radius: 4px;
                 cursor: ew-resize;
                 box-shadow: 2px 2px 6px rgba(163,177,198,0.6), -2px -2px 6px rgba(255,255,255,0.6);
@@ -674,11 +686,61 @@
         }
 
         // Moves the red playback line to the current time
-        function updatePlayhead() {
-          if (!duration) return;
-          const pct = (media.currentTime / duration) * 100;
-          playhead.style.left = pct + '%';
-        }
+                function updatePlayhead() {
+                  if (!duration || isDraggingPlayhead) return;
+                  const pct = (media.currentTime / duration) * 100;
+                  playhead.style.left = pct + '%';
+                }
+
+                // Playhead Drag / Scrubbing Logic
+                let isDraggingPlayhead = false;
+                let wasPlayingBeforeDrag = false;
+
+                function setPlayheadFromPointer(clientX) {
+                  if (!duration) return;
+                  const rect = timelineInner.getBoundingClientRect();
+                  const offsetX = clientX - rect.left;
+                  const clampedX = Math.max(0, Math.min(rect.width, offsetX));
+                  const newTime = (clampedX / rect.width) * duration;
+          
+                  media.currentTime = newTime;
+                  playhead.style.left = ((clampedX / rect.width) * 100) + '%';
+                }
+
+                playhead.addEventListener('pointerdown', (e) => {
+                  if (!duration) return;
+                  e.preventDefault();
+                  e.stopPropagation();
+                  isDraggingPlayhead = true;
+                  wasPlayingBeforeDrag = isPlaying;
+                  if (isPlaying) {
+                    media.pause();
+                    isPlaying = false;
+                    playIcon.style.display = 'block';
+                    pauseIcon.style.display = 'none';
+                    cancelAnimationFrame(animationFrame);
+                  }
+                  playhead.setPointerCapture(e.pointerId);
+                });
+
+                playhead.addEventListener('pointermove', (e) => {
+                  if (!isDraggingPlayhead) return;
+                  setPlayheadFromPointer(e.clientX);
+                });
+
+                const stopPlayheadDrag = (e) => {
+                  if (!isDraggingPlayhead) return;
+                  isDraggingPlayhead = false;
+                  try {
+                    playhead.releasePointerCapture(e.pointerId);
+                  } catch (err) {}
+                  if (wasPlayingBeforeDrag) {
+                    togglePlay();
+                  }
+                };
+
+                playhead.addEventListener('pointerup', stopPlayheadDrag);
+                playhead.addEventListener('pointercancel', stopPlayheadDrag);
 
         // Keeps the playhead visible by auto-scrolling the timeline while playing
         function followPlayhead() {
