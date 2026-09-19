@@ -731,9 +731,31 @@
         const btnZoomOut = document.getElementById('btnZoomOut');
 
         let zoomLevel = 1;
-        const MIN_ZOOM = 1;
-        const MAX_ZOOM = 40;
-        let waveformPeaks = null; // Real decoded audio peaks (null until decoded)
+                const MIN_ZOOM = 1;
+                const MAX_ZOOM = 40;
+                let waveformPeaks = null; // Real decoded audio peaks (null until decoded)
+
+                // Interaction state to prevent auto-scroll from fighting the user
+                let isTimelineInteracting = false;
+                let timelineInteractionTimeout = null;
+
+                function markTimelineInteraction() {
+                  isTimelineInteracting = true;
+                  clearTimeout(timelineInteractionTimeout);
+                  timelineInteractionTimeout = setTimeout(() => {
+                    isTimelineInteracting = false;
+                  }, 800); // Resume auto-scroll 800ms after you let go
+                }
+
+                timelineScroll.addEventListener('pointerdown', () => {
+                  isTimelineInteracting = true;
+                  clearTimeout(timelineInteractionTimeout);
+                });
+                window.addEventListener('pointerup', () => {
+                  if (isTimelineInteracting) markTimelineInteraction();
+                });
+                timelineScroll.addEventListener('wheel', markTimelineInteraction, {passive: true});
+                timelineScroll.addEventListener('touchmove', markTimelineInteraction, {passive: true});
 
     // File Upload Handler
         fileInput.addEventListener('change', function(e) {
@@ -983,10 +1005,12 @@
                         });
 
                         // Keeps the playhead visible by auto-scrolling the timeline while playing
-        function followPlayhead() {
-          const inner = timelineInner.offsetWidth;
-          const view = timelineScroll.clientWidth;
-          if (inner <= view) return;
+                                function followPlayhead() {
+                                  if (isTimelineInteracting || isDraggingPlayhead) return; // Suppress auto-scroll if user is zooming/sliding
+          
+                                  const inner = timelineInner.offsetWidth;
+                                  const view = timelineScroll.clientWidth;
+                                  if (inner <= view) return;
           const x = (media.currentTime / duration) * inner;
           const left = timelineScroll.scrollLeft;
           if (x < left + 20 || x > left + view - 40) {
