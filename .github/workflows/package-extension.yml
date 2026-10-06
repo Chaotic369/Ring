@@ -1,0 +1,21 @@
+name: Package Chrome Extension
+on:
+  workflow_dispatch:
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage Extension Files
+        run: |
+          mkdir -p extension-dist
+          cp manifest.json background.js extension-dist/
+          if [ -f "build-icon.png" ]; then
+            cp build-icon.png extension-dist/
+          fi
+      - name: Upload Extension Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Chrome-Extension-v1.0.0
+          path: extension-dist/
+          if-no-files-found: error
