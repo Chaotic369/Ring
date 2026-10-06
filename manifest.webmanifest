@@ -1,0 +1,15 @@
+{
+  "name": "Ring",
+  "short_name": "Ring",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0c",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "build-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
