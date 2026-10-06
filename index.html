@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(console.error);
+  });
+}
+</script>
   <meta charset="UTF-8">
   <!-- Forces a fixed 400px logical width to override developer option DPI scaling -->
   <meta name="viewport" content="width=400, user-scalable=no, viewport-fit=cover">
